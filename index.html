@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>URE Caieiras · Acompanhamento Conselho de Classe 1º Bimestre 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- PDF libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(145deg, #0a2f6c 0%, #041a3a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #eef3fb;
+        }
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #0f1a24e0;
+            border-radius: 48px;
+            padding: 24px;
+            box-shadow: 0 30px 35px rgba(0,0,0,0.5), inset 0 1px 4px rgba(255,255,200,0.1);
+            border: 1px solid #d32f2f;
+            backdrop-filter: blur(2px);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0a2f6ccc;
+            backdrop-filter: blur(4px);
+            padding: 12px 24px;
+            border-radius: 60px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .logo-area { display: flex; align-items: center; gap: 12px; }
+        .logo-area img { max-height: 50px; background: white; border-radius: 12px; padding: 4px; }
+        .title-badge { background: #d32f2f; color: white; padding: 6px 18px; border-radius: 3rem; font-weight: bold; }
+        h1 { font-size: 1.7rem; font-weight: 800; color: #ffec9e; text-align: center; margin-bottom: 20px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .report-bar { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 25px; }
+        button {
+            background: linear-gradient(135deg, #0a2f6c, #052050);
+            border: none;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.85rem;
+        }
+        button.primary { background: linear-gradient(135deg, #27ae60, #1e8449); }
+        button.pdf-btn { background: linear-gradient(135deg, #b6570f, #8e3a0a); }
+        button:hover { transform: translateY(-2px); filter: brightness(1.05); }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+            gap: 22px;
+            margin-top: 20px;
+        }
+        .card {
+            background: #1e2a36;
+            border-radius: 32px;
+            padding: 16px;
+            transition: 0.1s;
+            cursor: pointer;
+            border-left: 6px solid #2ecc71;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+        .card.vermelho { border-left-color: #e74c3c; background: #2a1f24; }
+        .card.verde { border-left-color: #2ecc71; }
+        .card:hover { transform: translateY(-5px); background: #253544; }
+        .card-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 12px; }
+        .school-name { font-weight: 800; font-size: 1.1rem; color: #ffec9e; }
+        .status-badge { font-size: 0.7rem; background: #00000066; padding: 2px 8px; border-radius: 50px; }
+        .indicadores { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.75rem; margin: 12px 0; }
+        .indicador-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #567; }
+        .card-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+        .modal {
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 1000;
+            overflow-y: auto; padding: 20px;
+        }
+        .modal-content {
+            background: #0f1a24;
+            max-width: 1000px;
+            margin: 20px auto;
+            border-radius: 40px;
+            padding: 24px;
+            border: 1px solid #d32f2f;
+            color: #ddd;
+        }
+        .form-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+        .form-group { flex: 1; min-width: 180px; }
+        label { font-weight: 600; font-size: 0.8rem; color: #ffec9e; display: block; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 8px 12px; border-radius: 20px; border: none; background: #2c3e3f; color: white; }
+        .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
+        .checkbox-group label { display: flex; align-items: center; gap: 5px; font-weight: normal; }
+        h3 { color: #f4c542; margin: 20px 0 10px 0; border-left: 4px solid #d32f2f; padding-left: 12px; }
+        .close-modal { float: right; background: #d32f2f; border-radius: 40px; padding: 6px 14px; cursor: pointer; }
+        .save-btn { margin-top: 20px; width: 100%; padding: 12px; }
+        footer { text-align: center; margin-top: 30px; font-size: 0.7rem; color: #b4c8e0; }
+        /* estilo para relatório offscreen */
+        .pdf-report-container {
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            background: white;
+            color: black;
+            font-family: 'Inter', sans-serif;
+            width: 1100px;
+            padding: 30px;
+            z-index: -1;
+        }
+        .pdf-report-container table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .pdf-report-container th, .pdf-report-container td { border: 1px solid #aaa; padding: 6px; text-align: left; font-size: 12px; }
+        .pdf-report-container th { background: #0a2f6c; color: white; }
+        @media (max-width: 700px) { .cards-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="main-container">
+    <div class="header">
+        <div class="logo-area">
+            <img src="https://i.ibb.co/0p01LzxB/logo3de.jpg" alt="Logo SEDUC" onerror="this.src='https://via.placeholder.com/50?text=SEDUC'">
+            <span>Plataforma de conselho de classe/ano · URE Caieiras</span>
+        </div>
+        <div class="title-badge">🎓 Conselho de Classe 1º Bim/2026</div>
+    </div>
+    <h1><i class="fas fa-chalkboard-user"></i> Acompanhamento Escolas · Semana 10 (05/04 à 11/04) <i class="fas fa-chart-line"></i></h1>
+    <div class="report-bar">
+        <button id="gerarRelatorioGeral" class="pdf-btn"><i class="fas fa-file-pdf"></i> Relatório PDF (todas escolas)</button>
+    </div>
+    <div id="cardsContainer" class="cards-grid">Carregando escolas...</div>
+    <footer>✅ Clique no card para editar todos os dados do conselho. Cards VERDES = dados iniciais (não salvos ainda) | VERMELHOS = já possuem registro no Firestore.</footer>
+</div>
+
+<!-- MODAL DETALHADO -->
+<div id="modalEscola" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModalBtn"><i class="fas fa-times"></i> Fechar</span>
+        <h2 id="modalTitulo">Editar Informações</h2>
+        <form id="detalhesForm">
+            <div class="form-row">
+                <div class="form-group"><label>🏫 Nome Escola</label><input type="text" id="escolaNome" readonly style="background:#3a4a4b;"></div>
+                <div class="form-group"><label>Categoria (PEC/SEC/SUPERVISOR)</label><select id="categoria"><option value="">Selecione</option><option>PEC</option><option>SEC</option><option>SUPERVISOR</option></select></div>
+            </div>
+            <h3>📊 Indicadores Semana 10 (05 a 11/04)</h3>
+            <div class="form-row">
+                <div class="form-group"><label>Aluno Presente (%)</label><input type="text" id="alunoPresente" placeholder="Ex: 88.3"></div>
+                <div class="form-group"><label>Professor Presente (%)</label><input type="text" id="professorPresente"></div>
+                <div class="form-group"><label>Plataformas (nota)</label><input type="text" id="plataformas"></div>
+                <div class="form-group"><label>Formação (nota)</label><input type="text" id="formacao"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Apoio Presencial (índice)</label><input type="text" id="apoioPresencial"></div>
+                <div class="form-group"><label>SARESP (média)</label><input type="text" id="saresp"></div>
+                <div class="form-group"><label>SARESP Equidade</label><input type="text" id="sarespEquidade"></div>
+                <div class="form-group"><label>Ajuste Desigualdades</label><input type="text" id="ajusteDesigualdades"></div>
+                <div class="form-group"><label>Nota Geral</label><input type="text" id="notaGeral"></div>
+            </div>
+            <h3>📌 Dados do Conselho</h3>
+            <div class="form-row">
+                <div class="form-group"><label>Turma Observada (série)</label><select id="turmaObservada"><option>5°anoAI</option><option>6°anoAF</option><option>7°anoAF</option><option>8°anoAF</option><option>9°anoAF</option><option>1ª série EM</option><option>2ª série EM</option><option>3ª série EM</option></select></div>
+                <div class="form-group"><label>Conselhos Acompanhados</label><select id="conselhosAcompanhados"><option>Anos iniciais</option><option>Anos finais</option><option>Ensino médio</option></select></div>
+            </div>
+            <div><label>🗓️ 3 Períodos com Data e Turno</label></div>
+            <div id="periodosContainer" style="display:flex; flex-wrap:wrap; gap:15px; margin-bottom:15px;"></div>
+            <div class="form-row"><div class="form-group"><label>FOI PARTICIPATIVO?</label><select id="participativo"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
+            <div class="form-group"><label>MATRICULADOS NA TURMA (número)</label><input type="number" id="matriculados"></div>
+            <div class="form-group"><label>ESTUDANTES PRESENTES (%)</label><input type="text" id="estudantesPresentes"></div>
+            <div class="form-group"><label>NÚMERO DE PAIS PRESENTES</label><input type="number" id="paisPresentes"></div></div>
+            <div><label>EQUIPE GESTORA PRESENTE (mult)</label><div class="checkbox-group" id="gestoraCheck"></div></div>
+            <div><label>⚙️ ELEMENTOS OTIMIZADORES (Conselho)</label><div class="checkbox-group" id="otimizadoresCheck"></div></div>
+            <div><label>🎯 AÇÕES TRATADAS NO CONSELHO</label><div class="checkbox-group" id="acoesCheck"></div></div>
+            <div><label>📱 PLATAFORMAS OTIMIZADORAS</label><div class="checkbox-group" id="plataformasCheck"></div></div>
+            <div class="form-row"><div class="form-group"><label>APRESENTOU DADOS COMPARATIVOS PROVA PAULISTA?</label><select id="dadosPaulista"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
+            <div class="form-group"><label>APRESENTOU OUTROS INSTRUMENTOS AVALIATIVOS?</label><select id="outrosInstrumentos"><option>Sim</option><option>Não</option><option>Parcial</option></select></div></div>
+            <div><label>📋 QUAIS INSTRUMENTOS FORAM APRESENTADOS (se Sim/Parcial)</label><div class="checkbox-group" id="instrumentosLista"></div></div>
+            <div class="form-row"><div class="form-group"><label>GRAU INTERAÇÃO ESTUDANTES</label><select id="interacaoEstudantes"><option>MUITA</option><option>POUCA</option><option>NENHUMA</option></select></div>
+            <div class="form-group"><label>GRAU INTERAÇÃO PAIS</label><select id="interacaoPais"><option>MUITA</option><option>POUCA</option><option>NENHUMA</option></select></div></div>
+            <div><label>📝 COMO AS NOTAS FORAM APRESENTADAS?</label><div class="checkbox-group" id="apresentacaoNotas"></div></div>
+            <div><label>🌟 ASPECTOS PRIORIZADOS NO CONSELHO</label><div class="checkbox-group" id="aspectosPriorizados"></div></div>
+            <div class="form-row"><div class="form-group"><label>ENGAJAMENTO DOS ESTUDANTES NAS APRENDIZAGENS?</label><select id="engajamento"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
+            <div class="form-group"><label>DECISÕES COMPARTILHADAS COM PAIS?</label><select id="decisoesPais"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
+            <div class="form-group"><label>PLANO DE AÇÃO DEFINIDO?</label><select id="planoAcao"><option>Sim</option><option>Não</option><option>Parcial</option></select></div></div>
+            <div class="form-group"><label>📝 OBSERVAÇÕES GERAIS</label><textarea id="observacoes" rows="3"></textarea></div>
+            <button type="button" id="salvarDetalhesBtn" class="primary save-btn"><i class="fas fa-save"></i> SALVAR DADOS (Firebase)</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Your web app's Firebase configuration
+ const firebaseConfig = {
+  apiKey: "AIzaSyDHgd5UbrdeXCsfDezkzMEskl0tc4QcBQU",
+  authDomain: "ure-caieiras-conselho.firebaseapp.com",
+  projectId: "ure-caieiras-conselho",
+  storageBucket: "ure-caieiras-conselho.firebasestorage.app",
+  messagingSenderId: "713109651546",
+  appId: "1:713109651546:web:44b5e50404f3ea50715863"
+ };
+    let db;
+    let firebaseInicializado = false;
+    try {
+        if (firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        firebaseInicializado = true;
+        console.log("Firebase conectado");
+    } catch(e) { console.warn("Firebase não configurado, usando fallback localStorage demo"); firebaseInicializado = false; }
+
+    // LISTA DE ESCOLAS COM DADOS SEMANA 10 
+    const escolasDataRaw = [
+        { nome:"ADAIL JARBAS DUCLOS - 48823", aluno:"88.3%",prof:"91.6%",plat:"8.5",form:"8.1",apoio:"1.50",saresp:"4.4",equidade:"-3.7",ajuste:"0.50",nota:"7.2"},
+        { nome:"AFONSO MORENO - 41853", aluno:"77.4%",prof:"73.4%",plat:"6.5",form:"8.7",apoio:"3.17",saresp:"3.5",equidade:"-8.5",ajuste:"0.90",nota:"6.2"},
+        { nome:"ALADINO POLON - 921002", aluno:"85.2%",prof:"95.5%",plat:"8.2",form:"8.7",apoio:"0.80",saresp:"4.5",equidade:"11.3",ajuste:"0.46",nota:"6.5"},
+        { nome:"ALBERTO GRAF CAPITAO - 5575", aluno:"78.9%",prof:"76.5%",plat:"7.0",form:"7.3",apoio:"2.75",saresp:"3.7",equidade:"-4.2",ajuste:"0.77",nota:"6.1"},
+        { nome:"ALBINO FIORE - 904351", aluno:"87.7%",prof:"89.6%",plat:"7.6",form:"8.8",apoio:"5.00",saresp:"6.5",equidade:"6.2",ajuste:"0.34",nota:"8.6"},
+        { nome:"ALFRIED THEODOR WEISZFLOG - 923138", aluno:"93.2%",prof:"",plat:"7.8",form:"8.2",apoio:"1.63",saresp:"5.0",equidade:"-3.8",ajuste:"0.51",nota:"7.4"},
+        { nome:"ANA MARIA GARRIDO ORLANDIN PROFA - 38337", aluno:"79.2%",prof:"75.5%",plat:"7.1",form:"6.8",apoio:"1.86",saresp:"3.0",equidade:"",ajuste:"0.86",nota:"5.7"},
+        { nome:"APARECIDO ROBERTO TONELLOTTI PROFESSOR - 923631", aluno:"81.9%",prof:"84.7%",plat:"5.0",form:"6.4",apoio:"1.60",saresp:"3.7",equidade:"-1.7",ajuste:"0.83",nota:"5.6"},
+        { nome:"ARMANDO SESTINI - 908381", aluno:"86.7%",prof:"95.5%",plat:"7.8",form:"8.6",apoio:"1.67",saresp:"5.6",equidade:"-4.6",ajuste:"0.52",nota:"8.0"},
+        { nome:"ARTHUR WEINGRILL - 41075", aluno:"87.1%",prof:"90.3%",plat:"7.9",form:"8.3",apoio:"0.50",saresp:"6.3",equidade:"-2.7",ajuste:"0.42",nota:"7.1"},
+        { nome:"AZEVEDO SOARES - 5666", aluno:"86.4%",prof:"91.6%",plat:"8.2",form:"7.7",apoio:"2.00",saresp:"4.0",equidade:"1.6",ajuste:"0.53",nota:"6.6"},
+        { nome:"BAIRRO DO ITAIM - 902366", aluno:"80.4%",prof:"87.6%",plat:"6.8",form:"6.6",apoio:"2.67",saresp:"4.3",equidade:"7.0",ajuste:"0.69",nota:"6.2"},
+        { nome:"BAIRRO JUNDIAIZINHO - 902652", aluno:"84.8%",prof:"71.4%",plat:"6.4",form:"6.9",apoio:"2.00",saresp:"3.8",equidade:"3.3",ajuste:"0.70",nota:"5.1"},
+        { nome:"BELEM DA SERRA - 5502", aluno:"84.7%",prof:"87.7%",plat:"8.4",form:"8.1",apoio:"0.60",saresp:"4.0",equidade:"9.5",ajuste:"0.59",nota:"5.3"},
+        { nome:"BENEDITO APARECIDO TAVARES PROF - 910636", aluno:"88.3%",prof:"73.1%",plat:"5.8",form:"7.3",apoio:"",saresp:"4.6",equidade:"6.0",ajuste:"0.51",nota:"5.5"},
+        { nome:"BENEDITO FAGUNDES MARQUES - 5712", aluno:"76.7%",prof:"74.6%",plat:"9.0",form:"8.2",apoio:"2.71",saresp:"3.3",equidade:"",ajuste:"0.54",nota:"6.0"},
+        { nome:"BUENO DE AZEVEDO FILHO PROF - 915233", aluno:"86.0%",prof:"70.6%",plat:"6.4",form:"8.2",apoio:"1.75",saresp:"3.9",equidade:"2.8",ajuste:"0.82",nota:"6.3"},
+        { nome:"CARLOS AUGUSTO DE PADUA FLEURY PROF - 908423", aluno:"90.7%",prof:"91.8%",plat:"7.3",form:"6.9",apoio:"1.33",saresp:"4.5",equidade:"-19.0",ajuste:"0.49",nota:"7.5"},
+        { nome:"CELESTINA VALENTE LENGENFELDER PROFA - 5770", aluno:"89.7%",prof:"82.8%",plat:"8.9",form:"8.7",apoio:"1.89",saresp:"4.8",equidade:"-0.5",ajuste:"0.42",nota:"6.8"},
+        { nome:"CHACARA CAMPONESA JARDIM VASSOURAS - 288408", aluno:"76.7%",prof:"76.3%",plat:"5.0",form:"7.7",apoio:"0.71",saresp:"3.7",equidade:"9.7",ajuste:"0.86",nota:"4.8"},
+        { nome:"DOMINGOS CAMBIAGHI PROF - 5708", aluno:"86.4%",prof:"80.2%",plat:"6.9",form:"8.6",apoio:"1.38",saresp:"5.2",equidade:"-3.4",ajuste:"0.41",nota:"6.1"},
+        { nome:"DR. MARIO TOLEDO DE MORAES - 901805", aluno:"88.2%",prof:"64.7%",plat:"7.3",form:"7.4",apoio:"2.75",saresp:"4.6",equidade:"-7.2",ajuste:"0.77",nota:"7.9"},
+        { nome:"DR. NELSON MANZANARES - 38325", aluno:"86.5%",prof:"76.5%",plat:"5.6",form:"7.5",apoio:"1.50",saresp:"4.7",equidade:"-4.9",ajuste:"0.59",nota:"4.8"},
+        { nome:"ELCIO JOSE PEREIRA COTRIM PROF - 902330", aluno:"83.4%",prof:"81.3%",plat:"7.0",form:"8.0",apoio:"0.56",saresp:"2.9",equidade:"",ajuste:"0.65",nota:"5.5"},
+        { nome:"ELVIRA PARADA MANGA PROFA - 48811", aluno:"82.3%",prof:"59.7%",plat:"8.1",form:"6.6",apoio:"1.83",saresp:"4.1",equidade:"-4.4",ajuste:"0.81",nota:"6.3"},
+        { nome:"FRANCISCO GONCALVES VIEIRA PROF - 5605", aluno:"91.7%",prof:"90.6%",plat:"5.6",form:"8.2",apoio:"2.40",saresp:"4.3",equidade:"5.5",ajuste:"0.50",nota:"6.9"},
+        { nome:"HERMELINA DE ALBUQUERQUE PASSARELLA PROFA - 5685", aluno:"78.6%",prof:"75.7%",plat:"6.5",form:"8.2",apoio:"1.67",saresp:"3.5",equidade:"-11.4",ajuste:"0.82",nota:"6.2"},
+        { nome:"IRACI SARTORI VIEIRA DA SILVA PROFA - 5769", aluno:"82.8%",prof:"83.7%",plat:"7.2",form:"7.4",apoio:"1.27",saresp:"4.5",equidade:"-13.7",ajuste:"0.53",nota:"6.4"},
+        { nome:"ISAIAS LUIZ MATIAZZO - 5587", aluno:"88.3%",prof:"74.7%",plat:"6.9",form:"6.6",apoio:"2.33",saresp:"5.4",equidade:"-5.3",ajuste:"0.40",nota:"7.0"},
+        { nome:"ISAURA DE MIRANDA BOTTO PROFA - 5678", aluno:"74.0%",prof:"90.2%",plat:"4.7",form:"8.0",apoio:"1.33",saresp:"3.8",equidade:"6.9",ajuste:"0.57",nota:"4.5"},
+        { nome:"ISAURA VALENTINI HANSER PROFA - 41836", aluno:"85.2%",prof:"",plat:"7.1",form:"6.4",apoio:"2.25",saresp:"4.1",equidade:"-4.8",ajuste:"0.73",nota:"5.6"},
+        { nome:"IVONE DOS ANJOS DA SILVA CAMPOS PROFA - 269396", aluno:"84.2%",prof:"85.8%",plat:"6.6",form:"8.4",apoio:"1.50",saresp:"4.4",equidade:"-3.1",ajuste:"0.59",nota:"6.1"},
+        { nome:"JARDIM ALEGRIA II - 50404", aluno:"82.1%",prof:"67.3%",plat:"5.9",form:"8.1",apoio:"3.00",saresp:"3.4",equidade:"-5.8",ajuste:"0.92",nota:"6.2"},
+        { nome:"JARDIM DAS ROSAS - 923114", aluno:"78.0%",prof:"87.9%",plat:"5.8",form:"7.8",apoio:"1.50",saresp:"3.6",equidade:"-2.8",ajuste:"0.83",nota:"5.8"},
+        { nome:"JARDIM SAO FRANCISCO - 913455", aluno:"78.5%",prof:"65.3%",plat:"7.8",form:"7.4",apoio:"0.67",saresp:"4.7",equidade:"2.1",ajuste:"0.70",nota:"5.4"},
+        { nome:"JARDIM SILVIA II - 924532", aluno:"80.2%",prof:"",plat:"8.0",form:"7.1",apoio:"3.33",saresp:"3.5",equidade:"2.3",ajuste:"0.88",nota:"5.9"},
+        { nome:"JOAQUIM MARQUES DA SILVA SOBRINHO TTE - 5551", aluno:"89.0%",prof:"88.8%",plat:"7.9",form:"8.2",apoio:"1.60",saresp:"3.5",equidade:"",ajuste:"0.50",nota:"6.6"},
+        { nome:"JOCIMARA VIEIRA DA SILVA PROFA - 923643", aluno:"78.9%",prof:"",plat:"5.7",form:"6.3",apoio:"2.40",saresp:"3.6",equidade:"-3.1",ajuste:"0.83",nota:"5.6"},
+        { nome:"JOSE CARLOS DA SILVA JUNIOR - 44945", aluno:"80.8%",prof:"83.5%",plat:"6.3",form:"7.0",apoio:"2.67",saresp:"4.0",equidade:"8.5",ajuste:"0.70",nota:"5.9"},
+        { nome:"JOSE DE BARROS MARTINS EDITOR - 913443", aluno:"77.2%",prof:"70.9%",plat:"5.7",form:"7.3",apoio:"2.00",saresp:"3.5",equidade:"-1.5",ajuste:"0.89",nota:"5.1"},
+        { nome:"JOSE PARADA PROFESSOR - 50436", aluno:"80.0%",prof:"84.7%",plat:"5.7",form:"6.1",apoio:"4.00",saresp:"3.4",equidade:"6.6",ajuste:"0.91",nota:"5.2"},
+        { nome:"JOSE ROBERTO MELCHIOR DR - 902378", aluno:"81.4%",prof:"93.0%",plat:"8.3",form:"7.9",apoio:"0.75",saresp:"4.6",equidade:"-17.1",ajuste:"0.61",nota:"7.4"},
+        { nome:"KATIA MARIA TARIFA LEME TONELLI PROFA - 50428", aluno:"88.7%",prof:"64.0%",plat:"7.0",form:"6.7",apoio:"2.83",saresp:"3.9",equidade:"-0.4",ajuste:"0.87",nota:"6.8"},
+        { nome:"LENITA CORREA CAMARGO PROFA - 916869", aluno:"89.5%",prof:"77.0%",plat:"8.4",form:"7.5",apoio:"1.40",saresp:"4.6",equidade:"-0.6",ajuste:"0.60",nota:"6.4"},
+        { nome:"LUIZ ALEXANDRE DOS SANTOS VEREADOR - 921038", aluno:"81.6%",prof:"68.9%",plat:"7.8",form:"8.5",apoio:"3.00",saresp:"3.7",equidade:"-15.3",ajuste:"0.81",nota:"7.5"},
+        { nome:"LYDIA SCALET WALKER PROFA - 906232", aluno:"80.4%",prof:"82.0%",plat:"7.7",form:"7.4",apoio:"2.75",saresp:"3.8",equidade:"6.3",ajuste:"0.75",nota:"5.0"},
+        { nome:"MARIA ZEZA GOMES DE OLIVEIRA - 902385", aluno:"84.4%",prof:"77.5%",plat:"8.6",form:"7.1",apoio:"3.00",saresp:"4.3",equidade:"-4.3",ajuste:"0.71",nota:"7.2"},
+        { nome:"NAIR HANNICKEL ROMARO - 904934", aluno:"85.7%",prof:"79.7%",plat:"5.3",form:"7.4",apoio:"2.33",saresp:"4.3",equidade:"-0.5",ajuste:"0.70",nota:"6.2"},
+        { nome:"NIDE ZAIM CARDOSO PROFA - 5642", aluno:"84.6%",prof:"94.0%",plat:"7.4",form:"8.0",apoio:"1.83",saresp:"4.0",equidade:"-15.2",ajuste:"0.74",nota:"7.7"},
+        { nome:"ODARICO OLIVEIRA NASCIMENTO PROF - 5733", aluno:"85.4%",prof:"86.4%",plat:"8.7",form:"8.4",apoio:"2.00",saresp:"4.2",equidade:"-8.3",ajuste:"0.72",nota:"7.5"},
+        { nome:"OLINDO DARTORA DR - 5599", aluno:"84.4%",prof:"99.5%",plat:"7.8",form:"8.2",apoio:"1.33",saresp:"4.3",equidade:"26.7",ajuste:"0.45",nota:"5.6"},
+        { nome:"OTTO WEISZFLOG - 5629", aluno:"86.0%",prof:"80.9%",plat:"7.9",form:"5.7",apoio:"3.33",saresp:"4.2",equidade:"-8.6",ajuste:"0.68",nota:"7.4"},
+        { nome:"OZILDE ALBUQUERQUE PASSARELLA DR - 39445", aluno:"86.3%",prof:"79.8%",plat:"4.6",form:"8.3",apoio:"1.20",saresp:"3.8",equidade:"0.0",ajuste:"0.74",nota:"5.8"},
+        { nome:"PARQUE CENTO E VINTE II - 924167", aluno:"80.7%",prof:"82.1%",plat:"6.3",form:"7.6",apoio:"2.83",saresp:"3.6",equidade:"6.3",ajuste:"0.91",nota:"5.8"},
+        { nome:"PAULO DUARTE - 902676", aluno:"82.2%",prof:"87.0%",plat:"6.8",form:"8.6",apoio:"2.80",saresp:"3.5",equidade:"-0.3",ajuste:"0.78",nota:"6.3"},
+        { nome:"PEDRO GALRAO DO NASCIMENTO - 5721", aluno:"78.2%",prof:"96.6%",plat:"7.5",form:"7.9",apoio:"1.00",saresp:"5.8",equidade:"-13.4",ajuste:"0.50",nota:"7.5"},
+        { nome:"PEDRO LELIS DE SOUZA PREFEITO - 406806", aluno:"89.3%",prof:"63.1%",plat:"5.4",form:"6.4",apoio:"0.13",saresp:"3.8",equidade:"-19.3",ajuste:"0.62",nota:"6.3"},
+        { nome:"PEDRO PAULO DE AGUIAR - 921026", aluno:"81.8%",prof:"72.7%",plat:"8.1",form:"7.5",apoio:"3.25",saresp:"3.6",equidade:"-3.0",ajuste:"0.88",nota:"6.6"},
+        { nome:"PIETRO PETRI - 5745", aluno:"85.2%",prof:"63.0%",plat:"6.8",form:"6.9",apoio:"3.00",saresp:"3.5",equidade:"-11.5",ajuste:"0.84",nota:"7.0"},
+        { nome:"RITUCO MITANI PROFA - 5691", aluno:"78.8%",prof:"72.2%",plat:"4.8",form:"7.3",apoio:"2.25",saresp:"3.8",equidade:"13.9",ajuste:"0.76",nota:"4.3"},
+        { nome:"ROGERIO LEVORIN PROF - 38349", aluno:"83.1%",prof:"72.4%",plat:"4.8",form:"6.4",apoio:"3.00",saresp:"3.6",equidade:"11.8",ajuste:"0.85",nota:"5.8"},
+        { nome:"SUZANA DIAS - 5538", aluno:"90.4%",prof:"78.0%",plat:"5.3",form:"6.1",apoio:"1.33",saresp:"3.0",equidade:"",ajuste:"0.87",nota:"6.0"},
+        { nome:"ULYSSES SANCHES RAMIRES PROF - 48781", aluno:"86.5%",prof:"68.9%",plat:"8.0",form:"6.2",apoio:"3.00",saresp:"3.9",equidade:"-8.2",ajuste:"0.81",nota:"7.0"},
+        { nome:"VINCENZO LOBASSI - 44957", aluno:"81.4%",prof:"85.7%",plat:"5.8",form:"7.4",apoio:"0.33",saresp:"3.7",equidade:"8.7",ajuste:"0.77",nota:"5.3"},
+        { nome:"WALTER RIBAS DE ANDRADE PROF EE - 5548", aluno:"88.1%",prof:"",plat:"6.5",form:"8.2",apoio:"1.00",saresp:"3.4",equidade:"",ajuste:"0.62",nota:"5.8"},
+        { nome:"WALTHER WEISZFLOG - 5630", aluno:"94.4%",prof:"95.0%",plat:"9.0",form:"8.7",apoio:"2.00",saresp:"4.2",equidade:"",ajuste:"0.36",nota:"7.6"},
+        { nome:"ZILTON BICUDO PROF - 925482", aluno:"78.2%",prof:"75.9%",plat:"7.3",form:"6.8",apoio:"1.75",saresp:"3.7",equidade:"1.6",ajuste:"0.89",nota:"5.6"}
+    ];
+
+    function carregarChecklists() {
+        const gestoraDiv = document.getElementById("gestoraCheck"); gestoraDiv.innerHTML = ["DIRETOR(A)","VICE","COORDENAÇÃO","OUTROS PROFISSIONAIS"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+        document.getElementById("otimizadoresCheck").innerHTML = ["SUPER BI","SALA DO FUTURO","ALUNO PRESENTE"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+        document.getElementById("acoesCheck").innerHTML = ["SARESP","AÇÕES DE RECOMPOSIÇÃO","NÃO HOUVE"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+        document.getElementById("plataformasCheck").innerHTML = ["ALURA","KHAN ACADEMY","MATIFIC","LEIA SP","SPEAK","ELEFANTE LETRADO","REDAÇÃO SP"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+        document.getElementById("instrumentosLista").innerHTML = ["Provas Escritas","Trabalhos em Grupo","Seminários","Listas de Exercícios","Questionários","Redações","Autoavaliação","Coavaliação","Portfólios","Observação do Professor","Estudos de Caso","Debates","Relatórios","Lições de Casa","Produções Artísticas"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+        document.getElementById("apresentacaoNotas").innerHTML = ["Resultados de Provas Escritas","Avaliação de Trabalhos","Desempenho em Seminários","Média de Exercícios","Produções Textuais","Autoavaliação","Análise de Portfólios","Registros de Observação","Estudos de Caso","Participação em Debates","Relatórios","Expressão Artística"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+        document.getElementById("aspectosPriorizados").innerHTML = ["ASPECTOS ORGANIZACIONAIS","ASPECTOS ACADÊMICOS","ASPECTOS SOCIOEMOCIONAIS","TODOS OS ASPECTOS ACIMA"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+        let periodosHtml = ''; for(let i=1;i<=3;i++) periodosHtml+=`<div><label>Data ${i}</label><input type="date" class="dataPeriodo" data-idx="${i}"><label>Período</label><select class="periodoSelect" data-idx="${i}"><option>manhã</option><option>tarde</option><option>noite</option><option>manhã/tarde</option><option>manhã/noite</option><option>manhã/tarde/noite</option></select></div>`;
+        document.getElementById("periodosContainer").innerHTML = periodosHtml;
+    }
+
+    async function salvarDadosEscola(escolaId, dadosCompletos) { if(firebaseInicializado) await db.collection("escolas").doc(escolaId).set(dadosCompletos, {merge:true}); else localStorage.setItem(`escola_${escolaId}`,JSON.stringify(dadosCompletos)); }
+    async function carregarDadosFirestore(escolaId) { if(firebaseInicializado){ let doc=await db.collection("escolas").doc(escolaId).get(); return doc.exists?doc.data():null; } else return JSON.parse(localStorage.getItem(`escola_${escolaId}`)); }
+
+    window.renderCards = async function(){
+        let container=document.getElementById("cardsContainer");
+        container.innerHTML="Carregando...";
+        let cardsHtml="";
+        for(let escola of escolasDataRaw){
+            let docId=escola.nome.replace(/[ /]/g,"_");
+            let saved=await carregarDadosFirestore(docId);
+            let data=saved?{...escola,...saved.resumo,...saved}:{...escola};
+            let classeCard=saved?"vermelho":"verde";
+            cardsHtml+=`<div class="card ${classeCard}" data-escola-id="${docId}" data-escola-nome="${escola.nome}">
+                <div class="card-header"><span class="school-name">${escola.nome}</span><span class="status-badge">${saved?"✓ Registrado":"📝 Pendente"}</span></div>
+                <div class="indicadores"><div class="indicador-item"><span>👥 Aluno Pres:</span><b>${data.aluno||escola.aluno}</b></div><div class="indicador-item"><span>👩‍🏫 Prof Pres:</span><b>${data.prof||escola.prof}</b></div><div class="indicador-item"><span>📱 Plataformas:</span><b>${data.plat||escola.plat}</b></div><div class="indicador-item"><span>🎓 Formação:</span><b>${data.form||escola.form}</b></div><div class="indicador-item"><span>🤝 Apoio Pres:</span><b>${data.apoio||escola.apoio}</b></div><div class="indicador-item"><span>📊 SARESP:</span><b>${data.saresp||escola.saresp}</b></div><div class="indicador-item"><span>⚖️ Equidade:</span><b>${data.equidade||escola.equidade}</b></div><div class="indicador-item"><span>🔄 Ajuste:</span><b>${data.ajuste||escola.ajuste}</b></div><div class="indicador-item"><span>⭐ Nota:</span><b>${data.nota||escola.nota}</b></div></div>
+                <div class="card-actions"><button class="pdf-card-btn" data-id="${docId}" data-nome="${escola.nome}"><i class="fas fa-print"></i> PDF Escola</button></div>
+            </div>`;
+        }
+        container.innerHTML=cardsHtml;
+        document.querySelectorAll(".card").forEach(card=>card.addEventListener("click",(e)=>{if(!e.target.closest(".pdf-card-btn")) abrirModalEdicao(card.dataset.escolaId,card.dataset.escolaNome);}));
+        document.querySelectorAll(".pdf-card-btn").forEach(btn=>btn.addEventListener("click",(e)=>{e.stopPropagation(); gerarPDFEscolaIndividual(btn.dataset.id,btn.dataset.nome);}));
+    };
+
+    async function abrirModalEdicao(escolaId,nomeEscola){
+        let saved=await carregarDadosFirestore(escolaId);
+        let padrao=escolasDataRaw.find(e=>e.nome===nomeEscola);
+        let dados={...padrao,...(saved?.resumo||{}),...(saved?.detalhes||{})};
+        document.getElementById("escolaNome").value=nomeEscola;
+        document.getElementById("alunoPresente").value=dados.aluno||padrao.aluno;
+        document.getElementById("professorPresente").value=dados.prof||padrao.prof;
+        document.getElementById("plataformas").value=dados.plat||padrao.plat;
+        document.getElementById("formacao").value=dados.form||padrao.form;
+        document.getElementById("apoioPresencial").value=dados.apoio||padrao.apoio;
+        document.getElementById("saresp").value=dados.saresp||padrao.saresp;
+        document.getElementById("sarespEquidade").value=dados.equidade||padrao.equidade;
+        document.getElementById("ajusteDesigualdades").value=dados.ajuste||padrao.ajuste;
+        document.getElementById("notaGeral").value=dados.nota||padrao.nota;
+        document.getElementById("categoria").value=dados.categoria||"";
+        document.getElementById("turmaObservada").value=dados.turmaObservada||"5°anoAI";
+        document.getElementById("conselhosAcompanhados").value=dados.conselhosAcompanhados||"Anos iniciais";
+        document.getElementById("participativo").value=dados.participativo||"Sim";
+        document.getElementById("matriculados").value=dados.matriculados||"";
+        document.getElementById("estudantesPresentes").value=dados.estudantesPresentes||"";
+        document.getElementById("paisPresentes").value=dados.paisPresentes||"";
+        document.getElementById("dadosPaulista").value=dados.dadosPaulista||"Sim";
+        document.getElementById("outrosInstrumentos").value=dados.outrosInstrumentos||"Não";
+        document.getElementById("interacaoEstudantes").value=dados.interacaoEstudantes||"MUITA";
+        document.getElementById("interacaoPais").value=dados.interacaoPais||"MUITA";
+        document.getElementById("engajamento").value=dados.engajamento||"Sim";
+        document.getElementById("decisoesPais").value=dados.decisoesPais||"Sim";
+        document.getElementById("planoAcao").value=dados.planoAcao||"Sim";
+        document.getElementById("observacoes").value=dados.observacoes||"";
+        window.escolaIdAtual=escolaId;
+        document.getElementById("modalEscola").style.display="block";
+    }
+
+    document.getElementById("salvarDetalhesBtn").onclick=async function(){
+        let resumo={aluno:document.getElementById("alunoPresente").value, prof:document.getElementById("professorPresente").value, plat:document.getElementById("plataformas").value, form:document.getElementById("formacao").value, apoio:document.getElementById("apoioPresencial").value, saresp:document.getElementById("saresp").value, equidade:document.getElementById("sarespEquidade").value, ajuste:document.getElementById("ajusteDesigualdades").value, nota:document.getElementById("notaGeral").value};
+        let detalhesColeta={categoria:document.getElementById("categoria").value, turmaObservada:document.getElementById("turmaObservada").value, conselhosAcompanhados:document.getElementById("conselhosAcompanhados").value, participativo:document.getElementById("participativo").value, matriculados:document.getElementById("matriculados").value, estudantesPresentes:document.getElementById("estudantesPresentes").value, paisPresentes:document.getElementById("paisPresentes").value, dadosPaulista:document.getElementById("dadosPaulista").value, outrosInstrumentos:document.getElementById("outrosInstrumentos").value, interacaoEstudantes:document.getElementById("interacaoEstudantes").value, interacaoPais:document.getElementById("interacaoPais").value, engajamento:document.getElementById("engajamento").value, decisoesPais:document.getElementById("decisoesPais").value, planoAcao:document.getElementById("planoAcao").value, observacoes:document.getElementById("observacoes").value, equipeGestora:[...document.querySelectorAll("#gestoraCheck input:checked")].map(i=>i.value), otimizadores:[...document.querySelectorAll("#otimizadoresCheck input:checked")].map(i=>i.value), acoesTratadas:[...document.querySelectorAll("#acoesCheck input:checked")].map(i=>i.value), plataformasUsadas:[...document.querySelectorAll("#plataformasCheck input:checked")].map(i=>i.value), instrumentosAvaliativos:[...document.querySelectorAll("#instrumentosLista input:checked")].map(i=>i.value), apresentacaoNotas:[...document.querySelectorAll("#apresentacaoNotas input:checked")].map(i=>i.value), aspectosPriorizados:[...document.querySelectorAll("#aspectosPriorizados input:checked")].map(i=>i.value)};
+        let periodos=[]; for(let i=1;i<=3;i++){ let data=document.querySelector(`.dataPeriodo[data-idx="${i}"]`).value; let periodo=document.querySelector(`.periodoSelect[data-idx="${i}"]`).value; if(data) periodos.push({data,periodo});}
+        detalhesColeta.periodosDatas=periodos;
+        let documentoFinal={resumo, detalhes:detalhesColeta, ultimaAtualizacao:new Date()};
+        if(firebaseInicializado) await db.collection("escolas").doc(window.escolaIdAtual).set(documentoFinal,{merge:true});
+        else localStorage.setItem(`escola_${window.escolaIdAtual}`,JSON.stringify(documentoFinal));
+        alert("Dados salvos com sucesso!");
+        document.getElementById("modalEscola").style.display="none";
+        renderCards();
+    };
+
+    // ==================== FUNÇÕES PDF REAIS ====================
+    async function gerarPDFEscolaIndividual(escolaId, nomeEscola) {
+        try {
+            const dadosSalvos = await carregarDadosFirestore(escolaId);
+            const padrao = escolasDataRaw.find(e=>e.nome===nomeEscola);
+            const dados = dadosSalvos ? {...padrao, ...dadosSalvos.resumo, ...dadosSalvos.detalhes} : padrao;
+            // Cria elemento temporário para renderizar o relatório
+            const divReport = document.createElement('div');
+            divReport.className = 'pdf-report-container';
+            divReport.style.position = 'absolute';
+            divReport.style.top = '-9999px';
+            divReport.style.left = '-9999px';
+            divReport.style.backgroundColor = 'white';
+            divReport.style.padding = '20px';
+            divReport.style.width = '1000px';
+            divReport.style.fontFamily = 'Inter, sans-serif';
+            divReport.innerHTML = `
+                <div style="text-align:center; margin-bottom:20px;">
+                    <h2 style="color:#0a2f6c;">URE CAIEIRAS - Conselho de Classe 1º Bimestre 2026</h2>
+                    <h3>Relatório Individual da Escola</h3>
+                    <p><strong>${nomeEscola}</strong> - Semana 10 (05/04 a 11/04)</p>
+                </div>
+                <table style="width:100%; border-collapse:collapse; margin-bottom:20px;">
+                    <tr><th style="background:#0a2f6c;color:white;padding:8px;">Indicador</th><th style="background:#0a2f6c;color:white;padding:8px;">Valor</th></tr>
+                    <tr><td>Aluno Presente (%)</td><td>${dados.aluno || ''}</td></tr>
+                    <tr><td>Professor Presente (%)</td><td>${dados.prof || ''}</td></tr>
+                    <tr><td>Plataformas (nota)</td><td>${dados.plat || ''}</td></tr>
+                    <tr><td>Formação (nota)</td><td>${dados.form || ''}</td></tr>
+                    <tr><td>Apoio Presencial</td><td>${dados.apoio || ''}</td></tr>
+                    <tr><td>SARESP</td><td>${dados.saresp || ''}</td></tr>
+                    <tr><td>SARESP Equidade</td><td>${dados.equidade || ''}</td></tr>
+                    <tr><td>Ajuste Desigualdades</td><td>${dados.ajuste || ''}</td></tr>
+                    <tr><td>Nota Geral</td><td>${dados.nota || ''}</td></tr>
+                </table>
+                <h4>📌 Dados do Conselho</h4>
+                <p><strong>Categoria:</strong> ${dados.categoria || '-'}</p>
+                <p><strong>Turma Observada:</strong> ${dados.turmaObservada || '-'}</p>
+                <p><strong>Conselhos Acompanhados:</strong> ${dados.conselhosAcompanhados || '-'}</p>
+                <p><strong>FOI PARTICIPATIVO:</strong> ${dados.participativo || '-'}</p>
+                <p><strong>Estudantes Presentes (%):</strong> ${dados.estudantesPresentes || '-'}</p>
+                <p><strong>Equipe Gestora Presente:</strong> ${(dados.equipeGestora || []).join(', ') || '-'}</p>
+                <p><strong>Observações:</strong> ${dados.observacoes || 'Nenhuma'}</p>
+                <p style="font-size:10px; margin-top:20px;">Relatório gerado em ${new Date().toLocaleString()}</p>
+            `;
+            document.body.appendChild(divReport);
+            const canvas = await html2canvas(divReport, { scale: 2 });
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 190;
+            const pageHeight = 277;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 10;
+            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+            pdf.save(`Relatorio_Escola_${nomeEscola.substring(0,30)}.pdf`);
+            document.body.removeChild(divReport);
+        } catch(e) { alert("Erro ao gerar PDF: "+e.message); }
+    }
+
+    async function gerarRelatorioGeralPDF() {
+        const divGeral = document.createElement('div');
+        divGeral.className = 'pdf-report-container';
+        divGeral.style.position = 'absolute';
+        divGeral.style.top = '-9999px';
+        divGeral.style.backgroundColor = 'white';
+        divGeral.style.padding = '20px';
+        divGeral.style.width = '1100px';
+        divGeral.innerHTML = `<div style="text-align:center;"><h2 style="color:#0a2f6c;">URE CAIEIRAS - Relatório Geral do Conselho de Classe</h2><h3>1º Bimestre 2026 - Semana 10 (05/04 a 11/04)</h3><p>Total de escolas: ${escolasDataRaw.length}</p></div>
+        <table style="width:100%; border-collapse:collapse; font-size:10px;"><thead><tr><th>Escola</th><th>Aluno%</th><th>Prof%</th><th>Plataf.</th><th>Formação</th><th>Apoio</th><th>SARESP</th><th>Equidade</th><th>Ajuste</th><th>Nota</th></tr></thead><tbody>`;
+        for(let escola of escolasDataRaw){
+            let docId=escola.nome.replace(/[ /]/g,"_");
+            let saved=await carregarDadosFirestore(docId);
+            let data=saved?{...escola,...saved.resumo}:{...escola};
+            divGeral.innerHTML += `<tr><td>${escola.nome}</td><td>${data.aluno||''}</td><td>${data.prof||''}</td><td>${data.plat||''}</td><td>${data.form||''}</td><td>${data.apoio||''}</td><td>${data.saresp||''}</td><td>${data.equidade||''}</td><td>${data.ajuste||''}</td><td>${data.nota||''}</td></tr>`;
+        }
+        divGeral.innerHTML += `</tbody></table><p style="margin-top:20px;">Relatório consolidado gerado em ${new Date().toLocaleString()}</p>`;
+        document.body.appendChild(divGeral);
+        const canvas = await html2canvas(divGeral, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('landscape', 'mm', 'a4');
+        const imgWidth = 280;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        pdf.save(`Relatorio_Geral_Conselho_2026.pdf`);
+        document.body.removeChild(divGeral);
+    }
+
+    document.getElementById("gerarRelatorioGeral").addEventListener("click", gerarRelatorioGeralPDF);
+    document.getElementById("closeModalBtn").onclick=()=>document.getElementById("modalEscola").style.display="none";
+    carregarChecklists();
+    renderCards();
+</script>
+</body>
+</html>
