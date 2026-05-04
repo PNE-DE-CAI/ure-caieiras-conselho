@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>URE Caieiras · Acompanhamento Conselho de Classe · 1º Bimestre 2026</title>
+    <title>URE Caieiras · Acompanhamento Conselho · 1º Bimestre 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- PDF libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
@@ -27,6 +29,7 @@
             padding: 24px;
             box-shadow: 0 30px 35px rgba(0,0,0,0.5);
             border: 1px solid #d32f2f;
+            backdrop-filter: blur(2px);
         }
         .header {
             display: flex;
@@ -106,9 +109,10 @@
         .save-btn { margin-top: 20px; width: 100%; padding: 12px; }
         .historico-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12px; }
         .historico-table th, .historico-table td { border: 1px solid #555; padding: 8px; text-align: left; }
-        .pdf-report-container { position: fixed; top: -9999px; left: -9999px; background: white; color: black; width: 1100px; padding: 30px; z-index: -1; }
+        .pdf-report-container { position: fixed; top: -9999px; left: -9999px; background: white; color: black; width: 1100px; padding: 30px; z-index: -1; font-family: 'Inter', sans-serif; }
         footer { text-align: center; margin-top: 30px; font-size: 0.7rem; }
         @media (max-width: 700px) { .cards-grid { grid-template-columns: 1fr; } }
+        .loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 2000; font-size: 1.5rem; }
     </style>
 </head>
 <body>
@@ -125,7 +129,7 @@
         <button id="gerarRelatorioGeral" class="pdf-btn"><i class="fas fa-file-pdf"></i> Relatório Geral (todas escolas)</button>
     </div>
     <div id="cardsContainer" class="cards-grid">Carregando escolas...</div>
-    <footer>✅ Clique no card para cadastrar um novo acompanhamento (data/turno). Cada dia gera um registro independente. Campo "Responsável" obrigatório.</footer>
+    <footer>✅ Clique no card para cadastrar um novo acompanhamento. Cada dia gera um registro independente. Campo "Responsável" obrigatório.</footer>
 </div>
 
 <!-- MODAL PRINCIPAL -->
@@ -143,11 +147,9 @@
         <form id="detalhesForm">
             <div class="form-row">
                 <div class="form-group"><label>🧑‍💼 Responsável pelo acompanhamento *</label><input type="text" id="responsavel" placeholder="Nome completo" required></div>
-            </div>
-            <div class="form-row">
                 <div class="form-group"><label>📅 Data do conselho</label><input type="date" id="dataConselho" required></div>
                 <div class="form-group"><label>🕒 Turno</label><select id="turno"><option>manhã</option><option>tarde</option><option>noite</option><option>manhã/tarde</option><option>manhã/noite</option><option>manhã/tarde/noite</option></select></div>
-                <div class="form-group"><label>Categoria (PEC/SEC/SUPERVISOR)</label><select id="categoria"><option>PEC</option><option>SEC</option><option>SUPERVISOR</option></select></div>
+                <div class="form-group"><label>Categoria</label><select id="categoria"><option>PEC</option><option>SEC</option><option>SUPERVISOR</option></select></div>
             </div>
             <h3>📊 Indicadores da Semana (fixos para a escola)</h3>
             <div class="form-row">
@@ -187,32 +189,27 @@
             <div class="form-group"><label>DECISÕES COMPARTILHADAS COM PAIS?</label><select id="decisoesPais"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
             <div class="form-group"><label>PLANO DE AÇÃO DEFINIDO?</label><select id="planoAcao"><option>Sim</option><option>Não</option><option>Parcial</option></select></div></div>
             <div class="form-group"><label>📝 OBSERVAÇÕES</label><textarea id="observacoes" rows="2"></textarea></div>
-            <button type="button" id="salvarDetalhesBtn" class="primary save-btn"><i class="fas fa-save"></i> SALVAR REGISTRO</button>
+            <button type="button" id="salvarDetalhesBtn" class="primary save-btn"><i class="fas fa-save"></i> SALVAR REGISTRO (data/turno)</button>
         </form>
     </div>
 </div>
 
 <script>
-    // ========== FIREBASE CONFIG ========== 
-  const firebaseConfig = {
-  apiKey: "AIzaSyDHgd5UbrdeXCsfDezkzMEskl0tc4QcBQU",
-  authDomain: "ure-caieiras-conselho.firebaseapp.com",
-  projectId: "ure-caieiras-conselho",
-  storageBucket: "ure-caieiras-conselho.firebasestorage.app",
-  messagingSenderId: "713109651546",
-  appId: "1:713109651546:web:44b5e50404f3ea50715863"
-  };
+    // ========== FIREBASE CONFIG ==========
+    const firebaseConfig = {
+        apiKey: "AIzaSyDHgd5UbrdeXCsfDezkzMEskl0tc4QcBQU",
+        authDomain: "ure-caieiras-conselho.firebaseapp.com",
+        projectId: "ure-caieiras-conselho",
+        storageBucket: "ure-caieiras-conselho.firebasestorage.app",
+        messagingSenderId: "713109651546",
+        appId: "1:713109651546:web:44b5e50404f3ea50715863"
+    };
+    // Inicializar Firebase
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    let db, firebaseReady = false;
-    try {
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-        firebaseReady = true;
-    } catch(e) { console.warn("Firebase fallback para localStorage"); }
-
-    // ========== DADOS DAS ESCOLAS (67) ==========
-    // Lista de escolas (mesma do enunciado)
-    const escolasDataRaw = [
+    // ========== LISTA COMPLETA DAS 67 ESCOLAS ==========
+    const escolasData = [
         { nome:"ADAIL JARBAS DUCLOS - 48823", aluno:"88.3%",prof:"91.6%",plat:"8.5",form:"8.1",apoio:"1.50",saresp:"4.4",equidade:"-3.7",ajuste:"0.50",nota:"7.2"},
         { nome:"AFONSO MORENO - 41853", aluno:"77.4%",prof:"73.4%",plat:"6.5",form:"8.7",apoio:"3.17",saresp:"3.5",equidade:"-8.5",ajuste:"0.90",nota:"6.2"},
         { nome:"ALADINO POLON - 921002", aluno:"85.2%",prof:"95.5%",plat:"8.2",form:"8.7",apoio:"0.80",saresp:"4.5",equidade:"11.3",ajuste:"0.46",nota:"6.5"},
@@ -282,88 +279,119 @@
         { nome:"ZILTON BICUDO PROF - 925482", aluno:"78.2%",prof:"75.9%",plat:"7.3",form:"6.8",apoio:"1.75",saresp:"3.7",equidade:"1.6",ajuste:"0.89",nota:"5.6"}
     ];
 
-    // ========== AUX ==========
-    function getEscolaById(nome) { return escolasData.find(e => e.nome === nome); }
-
-    async function salvarAcompanhamento(escolaId, escolaNome, dados) {
-        const registro = {
-            ...dados,
-            escolaNome,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            createdAt: new Date().toISOString()
-        };
-        if (firebaseReady) {
-            const ref = db.collection("escolas").doc(escolaId).collection("acompanhamentos").doc();
-            await ref.set(registro);
-            return ref.id;
-        } else {
-            let local = JSON.parse(localStorage.getItem(`acomp_${escolaId}`) || "[]");
-            local.push({ id: Date.now().toString(), ...registro });
-            localStorage.setItem(`acomp_${escolaId}`, JSON.stringify(local));
-            return Date.now().toString();
-        }
+    // ========== FUNÇÕES FIRESTORE ==========
+    function getEscolaId(nomeEscola) {
+        return nomeEscola.replace(/[ /]/g, "_");
     }
 
     async function getAcompanhamentos(escolaId) {
-        if (firebaseReady) {
-            const snap = await db.collection("escolas").doc(escolaId).collection("acompanhamentos").orderBy("timestamp", "desc").get();
-            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        } else {
-            return JSON.parse(localStorage.getItem(`acomp_${escolaId}`) || "[]");
+        try {
+            const snapshot = await db.collection("escolas").doc(escolaId).collection("acompanhamentos").orderBy("timestamp", "desc").get();
+            return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        } catch (error) {
+            console.error("Erro ao buscar acompanhamentos:", error);
+            return [];
         }
     }
 
-    // Render cards
+    async function salvarAcompanhamento(escolaId, registro) {
+        try {
+            const docRef = await db.collection("escolas").doc(escolaId).collection("acompanhamentos").add({
+                ...registro,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            return docRef.id;
+        } catch (error) {
+            console.error("Erro ao salvar:", error);
+            throw error;
+        }
+    }
+
+    async function escolaPossuiRegistros(escolaId) {
+        try {
+            const snapshot = await db.collection("escolas").doc(escolaId).collection("acompanhamentos").limit(1).get();
+            return !snapshot.empty;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    // ========== RENDER CARDS ==========
     async function renderCards() {
         let container = document.getElementById("cardsContainer");
-        container.innerHTML = "Carregando...";
-        let html = "";
+        container.innerHTML = '<div style="text-align:center; padding:40px;">Carregando dados do Firebase...</div>';
+        
+        let cardsHtml = "";
         for(let escola of escolasData) {
-            let docId = escola.nome.replace(/[ /]/g, "_");
-            let acompList = await getAcompanhamentos(docId);
+            let escolaId = getEscolaId(escola.nome);
+            let temRegistros = await escolaPossuiRegistros(escolaId);
+            let acompList = temRegistros ? await getAcompanhamentos(escolaId) : [];
             let ultimo = acompList[0] || null;
-            let classe = acompList.length > 0 ? "vermelho" : "verde";
-            let status = acompList.length > 0 ? `✓ ${acompList.length} registro(s)` : "📝 Nenhum";
+            let classe = temRegistros ? "vermelho" : "verde";
+            let badge = temRegistros ? `✓ ${acompList.length} registro(s)` : "📝 Nenhum";
             let dadosExibir = ultimo || escola;
-            html += `<div class="card ${classe}" data-escola-id="${docId}" data-escola-nome="${escola.nome}">
-                <div class="card-header"><span class="school-name">${escola.nome}</span><span class="status-badge">${status}</span></div>
-                <div class="indicadores">
-                    <div class="indicador-item"><span>👥 Aluno Pres:</span><b>${dadosExibir.aluno || ''}</b></div>
-                    <div class="indicador-item"><span>👩‍🏫 Prof Pres:</span><b>${dadosExibir.prof || ''}</b></div>
-                    <div class="indicador-item"><span>📱 Plataformas:</span><b>${dadosExibir.plat || ''}</b></div>
-                    <div class="indicador-item"><span>🎓 Formação:</span><b>${dadosExibir.form || ''}</b></div>
-                    <div class="indicador-item"><span>🤝 Apoio Pres:</span><b>${dadosExibir.apoio || ''}</b></div>
-                    <div class="indicador-item"><span>📊 SARESP:</span><b>${dadosExibir.saresp || ''}</b></div>
-                    <div class="indicador-item"><span>⚖️ Equidade:</span><b>${dadosExibir.equidade || ''}</b></div>
-                    <div class="indicador-item"><span>🔄 Ajuste:</span><b>${dadosExibir.ajuste || ''}</b></div>
-                    <div class="indicador-item"><span>⭐ Nota:</span><b>${dadosExibir.nota || ''}</b></div>
+            
+            cardsHtml += `
+                <div class="card ${classe}" data-escola-id="${escolaId}" data-escola-nome="${escola.nome}">
+                    <div class="card-header">
+                        <span class="school-name">${escola.nome}</span>
+                        <span class="status-badge">${badge}</span>
+                    </div>
+                    <div class="indicadores">
+                        <div class="indicador-item"><span>👥 Aluno Pres:</span><b>${dadosExibir.alunoPresente || dadosExibir.aluno || ''}</b></div>
+                        <div class="indicador-item"><span>👩‍🏫 Prof Pres:</span><b>${dadosExibir.professorPresente || dadosExibir.prof || ''}</b></div>
+                        <div class="indicador-item"><span>📱 Plataformas:</span><b>${dadosExibir.plataformas || dadosExibir.plat || ''}</b></div>
+                        <div class="indicador-item"><span>🎓 Formação:</span><b>${dadosExibir.formacao || dadosExibir.form || ''}</b></div>
+                        <div class="indicador-item"><span>🤝 Apoio Pres:</span><b>${dadosExibir.apoioPresencial || dadosExibir.apoio || ''}</b></div>
+                        <div class="indicador-item"><span>📊 SARESP:</span><b>${dadosExibir.saresp || ''}</b></div>
+                        <div class="indicador-item"><span>⚖️ Equidade:</span><b>${dadosExibir.sarespEquidade || dadosExibir.equidade || ''}</b></div>
+                        <div class="indicador-item"><span>🔄 Ajuste:</span><b>${dadosExibir.ajusteDesigualdades || dadosExibir.ajuste || ''}</b></div>
+                        <div class="indicador-item"><span>⭐ Nota:</span><b>${dadosExibir.notaGeral || dadosExibir.nota || ''}</b></div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="pdf-card-btn" data-id="${escolaId}" data-nome="${escola.nome}"><i class="fas fa-print"></i> PDF último</button>
+                    </div>
                 </div>
-                <div class="card-actions"><button class="pdf-card-btn" data-id="${docId}" data-nome="${escola.nome}"><i class="fas fa-print"></i> PDF último</button></div>
-            </div>`;
+            `;
         }
-        container.innerHTML = html;
+        container.innerHTML = cardsHtml;
+        
+        // Adicionar eventos
         document.querySelectorAll(".card").forEach(card => {
-            card.addEventListener("click", (e) => { if(!e.target.closest(".pdf-card-btn")) abrirModal(card.dataset.escolaId, card.dataset.escolaNome); });
+            card.addEventListener("click", (e) => {
+                if(!e.target.closest(".pdf-card-btn")) abrirModal(card.dataset.escolaId, card.dataset.escolaNome);
+            });
         });
         document.querySelectorAll(".pdf-card-btn").forEach(btn => {
-            btn.addEventListener("click", (e) => { e.stopPropagation(); gerarPDFUltimo(btn.dataset.id, btn.dataset.nome); });
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                gerarPDFUltimo(btn.dataset.id, btn.dataset.nome);
+            });
         });
     }
 
+    // ========== MODAL ==========
+    let currentEscolaId = null;
     async function abrirModal(escolaId, escolaNome) {
-        window.escolaIdAtual = escolaId;
+        currentEscolaId = escolaId;
         document.getElementById("escolaNomeDisplay").innerText = escolaNome;
         let acompList = await getAcompanhamentos(escolaId);
         document.getElementById("totalRegistros").innerText = acompList.length;
+        
         let historicoHtml = `<h3>📜 Histórico de acompanhamentos</h3><table class="historico-table"><thead><tr><th>Data</th><th>Turno</th><th>Responsável</th><th>Ações</th></tr></thead><tbody>`;
         for(let reg of acompList) {
-            let dataStr = reg.dataConselho || (reg.timestamp?.toDate ? reg.timestamp.toDate().toLocaleDateString() : '-');
-            historicoHtml += `<tr><td>${dataStr}</td><td>${reg.turno || '-'}</td><td>${reg.responsavel || '-'}</td><td><button class="verRegistroBtn" data-id="${reg.id}" data-json='${JSON.stringify(reg)}'>Ver / PDF</button></td></tr>`;
+            historicoHtml += `<tr>
+                <td>${reg.dataConselho || '-'}</td>
+                <td>${reg.turno || '-'}</td>
+                <td>${reg.responsavel || '-'}</td>
+                <td><button class="verRegistroBtn" data-reg='${JSON.stringify(reg)}'>Ver / PDF</button></td>
+            </tr>`;
         }
         historicoHtml += `</tbody></table>`;
         document.getElementById("historicoArea").innerHTML = historicoHtml;
-        // Preencher campos com valores padrão da escola (indicadores)
-        let escola = getEscolaById(escolaNome);
+        
+        // Carregar dados da escola nos campos de indicadores
+        let escola = escolasData.find(e => e.nome === escolaNome);
         if(escola) {
             document.getElementById("alunoPresente").value = escola.aluno || "";
             document.getElementById("professorPresente").value = escola.prof || "";
@@ -375,28 +403,36 @@
             document.getElementById("ajusteDesigualdades").value = escola.ajuste || "";
             document.getElementById("notaGeral").value = escola.nota || "";
         }
+        
+        // Limpar campos do novo registro
         document.getElementById("responsavel").value = "";
         document.getElementById("dataConselho").value = "";
         document.getElementById("turno").value = "manhã";
-        // Limpar checklists (serão preenchidos depois)
+        document.getElementById("categoria").value = "PEC";
+        document.querySelectorAll("#gestoraCheck input, #otimizadoresCheck input, #acoesCheck input, #plataformasCheck input, #instrumentosLista input, #apresentacaoNotas input, #aspectosPriorizados input").forEach(ch => ch.checked = false);
+        document.getElementById("observacoes").value = "";
         document.getElementById("modalEscola").style.display = "block";
+        
         // Eventos dos botões de ver registro
         document.querySelectorAll(".verRegistroBtn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                let reg = JSON.parse(btn.dataset.json);
+            btn.addEventListener("click", () => {
+                let reg = JSON.parse(btn.dataset.reg);
                 gerarPDFRegistro(reg, escolaNome);
             });
         });
     }
 
-    // Salvar novo registro
+    // ========== SALVAR ==========
     document.getElementById("salvarDetalhesBtn").onclick = async () => {
         let responsavel = document.getElementById("responsavel").value.trim();
         let dataConselho = document.getElementById("dataConselho").value;
         let turno = document.getElementById("turno").value;
-        if(!responsavel || !dataConselho) { alert("Preencha responsável e data do conselho"); return; }
-        let escola = getEscolaById(document.getElementById("escolaNomeDisplay").innerText);
-        let dados = {
+        if(!responsavel || !dataConselho) {
+            alert("Preencha o responsável e a data do conselho!");
+            return;
+        }
+        
+        let registro = {
             responsavel, dataConselho, turno,
             categoria: document.getElementById("categoria").value,
             alunoPresente: document.getElementById("alunoPresente").value,
@@ -430,26 +466,64 @@
             planoAcao: document.getElementById("planoAcao").value,
             observacoes: document.getElementById("observacoes").value
         };
-        await salvarAcompanhamento(window.escolaIdAtual, document.getElementById("escolaNomeDisplay").innerText, dados);
-        alert("Registro salvo com sucesso!");
-        document.getElementById("modalEscola").style.display = "none";
-        renderCards();
+        
+        try {
+            await salvarAcompanhamento(currentEscolaId, registro);
+            alert("Registro salvo com sucesso no Firebase!");
+            document.getElementById("modalEscola").style.display = "none";
+            await renderCards();
+        } catch(error) {
+            alert("Erro ao salvar: " + error.message);
+        }
     };
 
-    // Funções de PDF (geral e individual)
+    // ========== FUNÇÕES PDF ==========
     async function gerarPDFRegistro(reg, nomeEscola) {
         const div = document.createElement('div');
         div.className = 'pdf-report-container';
-        div.innerHTML = `<div style="text-align:center"><h2>URE CAIEIRAS</h2><h3>Conselho de Classe - Acompanhamento</h3><p><strong>${nomeEscola}</strong></p><p>Data: ${reg.dataConselho} | Turno: ${reg.turno}</p><p>Responsável: ${reg.responsavel}</p></div>
-        <h3>Indicadores da Semana</h3><table>${Object.entries(reg).filter(([k])=>['alunoPresente','professorPresente','plataformas','formacao','apoioPresencial','saresp','sarespEquidade','ajusteDesigualdades','notaGeral'].includes(k)).map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</table>
-        <h3>Dados do Conselho</h3><table>${Object.entries(reg).filter(([k])=>['turmaObservada','conselhosAcompanhados','participativo','matriculados','estudantesPresentes','paisPresentes','dadosPaulista','outrosInstrumentos','interacaoEstudantes','interacaoPais','engajamento','decisoesPais','planoAcao','observacoes'].includes(k)).map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</table>
-        <h3>Checklists</h3><p><strong>Equipe Gestora:</strong> ${(reg.equipeGestora||[]).join(', ')}</p>
-        <p><strong>Otimizadores:</strong> ${(reg.otimizadores||[]).join(', ')}</p>
-        <p><strong>Ações:</strong> ${(reg.acoesTratadas||[]).join(', ')}</p>
-        <p><strong>Plataformas:</strong> ${(reg.plataformasUsadas||[]).join(', ')}</p>
-        <p><strong>Instrumentos:</strong> ${(reg.instrumentosAvaliativos||[]).join(', ')}</p>
-        <p><strong>Apresentação Notas:</strong> ${(reg.apresentacaoNotas||[]).join(', ')}</p>
-        <p><strong>Aspectos Priorizados:</strong> ${(reg.aspectosPriorizados||[]).join(', ')}</p>`;
+        div.innerHTML = `
+            <div style="text-align:center; margin-bottom:20px;">
+                <h2 style="color:#0a2f6c;">UNIDADE REGIONAL DE ENSINO CAIEIRAS</h2>
+                <h3>Conselho de Classe - 1º Bimestre 2026</h3>
+                <h4>Relatório de Acompanhamento</h4>
+                <p><strong>${nomeEscola}</strong></p>
+                <p>Data: ${reg.dataConselho} | Turno: ${reg.turno} | Responsável: ${reg.responsavel}</p>
+            </div>
+            <h3>📊 Indicadores da Semana</h3>
+            <table border="1" cellpadding="5" style="width:100%; border-collapse:collapse;">
+                ${[
+                    ['Aluno Presente (%)', reg.alunoPresente], ['Professor Presente (%)', reg.professorPresente],
+                    ['Plataformas (nota)', reg.plataformas], ['Formação (nota)', reg.formacao],
+                    ['Apoio Presencial', reg.apoioPresencial], ['SARESP', reg.saresp],
+                    ['SARESP Equidade', reg.sarespEquidade], ['Ajuste Desigualdades', reg.ajusteDesigualdades],
+                    ['Nota Geral', reg.notaGeral]
+                ].map(([k,v]) => `<tr><th>${k}</th><td>${v || ''}</td></tr>`).join('')}
+            </table>
+            <h3>📌 Dados do Conselho</h3>
+            <table border="1" cellpadding="5" style="width:100%;">
+                ${[
+                    ['Categoria', reg.categoria], ['Turma Observada', reg.turmaObservada],
+                    ['Conselhos Acompanhados', reg.conselhosAcompanhados], ['Foi Participativo?', reg.participativo],
+                    ['Matriculados', reg.matriculados], ['Estudantes Presentes (%)', reg.estudantesPresentes],
+                    ['Nº Pais Presentes', reg.paisPresentes], ['Apresentou Dados Prova Paulista?', reg.dadosPaulista],
+                    ['Apresentou Outros Instrumentos?', reg.outrosInstrumentos],
+                    ['Grau Interação Estudantes', reg.interacaoEstudantes], ['Grau Interação Pais', reg.interacaoPais],
+                    ['Engajamento dos Estudantes', reg.engajamento], ['Decisões Compartilhadas com Pais?', reg.decisoesPais],
+                    ['Plano de Ação Definido?', reg.planoAcao]
+                ].map(([k,v]) => `<tr><th>${k}</th><td>${v || ''}</td></tr>`).join('')}
+            </table>
+            <h3>✅ Checklists</h3>
+            <p><strong>Equipe Gestora:</strong> ${(reg.equipeGestora || []).join(', ') || '-'}</p>
+            <p><strong>Elementos Otimizadores:</strong> ${(reg.otimizadores || []).join(', ') || '-'}</p>
+            <p><strong>Ações Tratadas:</strong> ${(reg.acoesTratadas || []).join(', ') || '-'}</p>
+            <p><strong>Plataformas Utilizadas:</strong> ${(reg.plataformasUsadas || []).join(', ') || '-'}</p>
+            <p><strong>Instrumentos Avaliativos Apresentados:</strong> ${(reg.instrumentosAvaliativos || []).join(', ') || '-'}</p>
+            <p><strong>Apresentação das Notas:</strong> ${(reg.apresentacaoNotas || []).join(', ') || '-'}</p>
+            <p><strong>Aspectos Priorizados:</strong> ${(reg.aspectosPriorizados || []).join(', ') || '-'}</p>
+            <h3>✏️ Observações</h3>
+            <p>${reg.observacoes || 'Nenhuma'}</p>
+            <p style="font-size:10px; margin-top:30px;">Gerado em ${new Date().toLocaleString()}</p>
+        `;
         document.body.appendChild(div);
         const canvas = await html2canvas(div, { scale: 2 });
         const imgData = canvas.toDataURL('image/png');
@@ -457,24 +531,46 @@
         const pdf = new jsPDF('p', 'mm', 'a4');
         const imgWidth = 190;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        let heightLeft = imgHeight;
+        let position = 10;
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= (pdf.internal.pageSize.height - 20);
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+            heightLeft -= (pdf.internal.pageSize.height - 20);
+        }
         pdf.save(`Acompanhamento_${nomeEscola.substring(0,30)}_${reg.dataConselho}.pdf`);
         document.body.removeChild(div);
     }
+
     async function gerarPDFUltimo(escolaId, nomeEscola) {
-        let acomp = await getAcompanhamentos(escolaId);
-        if(acomp.length) gerarPDFRegistro(acomp[0], nomeEscola);
-        else alert("Nenhum registro encontrado");
+        let acompList = await getAcompanhamentos(escolaId);
+        if(acompList.length) gerarPDFRegistro(acompList[0], nomeEscola);
+        else alert("Nenhum registro encontrado para esta escola.");
     }
+
     async function gerarRelatorioGeralPDF() {
-        let todas = [];
+        let linhas = [];
         for(let escola of escolasData) {
-            let acomp = await getAcompanhamentos(escola.nome.replace(/[ /]/g,"_"));
-            if(acomp.length) todas.push({escola: escola.nome, ultimo: acomp[0]});
+            let escolaId = getEscolaId(escola.nome);
+            let acompList = await getAcompanhamentos(escolaId);
+            let ultimo = acompList[0] || null;
+            if(ultimo) {
+                linhas.push(`<tr><td>${escola.nome}</td><td>${ultimo.dataConselho}</td><td>${ultimo.responsavel}</td><td>${ultimo.alunoPresente || ''}</td><td>${ultimo.notaGeral || ''}</td></tr>`);
+            }
         }
         const div = document.createElement('div');
         div.className = 'pdf-report-container';
-        div.innerHTML = `<h2>Relatório Geral - URE Caieiras</h2><p>Total de escolas com registros: ${todas.length}</p><table border="1"><tr><th>Escola</th><th>Última data</th><th>Responsável</th><th>Aluno%</th><th>Nota</th></tr>${todas.map(t=>`<tr><td>${t.escola}</td><td>${t.ultimo.dataConselho}</td><td>${t.ultimo.responsavel}</td><td>${t.ultimo.alunoPresente}</td><td>${t.ultimo.notaGeral}</td></tr>`).join('')}</table>`;
+        div.innerHTML = `
+            <div style="text-align:center"><h2>URE CAIEIRAS - Relatório Geral</h2><h3>Conselho de Classe 1º Bimestre 2026</h3><p>Total de escolas com registros: ${linhas.length}</p></div>
+            <table border="1" cellpadding="5" style="width:100%; border-collapse:collapse;">
+                <thead><tr><th>Escola</th><th>Última data</th><th>Responsável</th><th>Aluno%</th><th>Nota</th></tr></thead>
+                <tbody>${linhas.join('')}</tbody>
+            </table>
+            <p>Gerado em ${new Date().toLocaleString()}</p>
+        `;
         document.body.appendChild(div);
         const canvas = await html2canvas(div, { scale: 2 });
         const imgData = canvas.toDataURL('image/png');
@@ -487,11 +583,8 @@
         document.body.removeChild(div);
     }
 
-    document.getElementById("gerarRelatorioGeral").addEventListener("click", gerarRelatorioGeralPDF);
-    document.getElementById("closeModalBtn").onclick = () => document.getElementById("modalEscola").style.display = "none";
-    // Inicializar checklists
+    // ========== INICIALIZAR CHECKLISTS ==========
     function initChecklists() {
-        const grupos = ["gestoraCheck","otimizadoresCheck","acoesCheck","plataformasCheck","instrumentosLista","apresentacaoNotas","aspectosPriorizados"];
         const opcoes = {
             gestoraCheck: ["DIRETOR(A)","VICE","COORDENAÇÃO","OUTROS PROFISSIONAIS"],
             otimizadoresCheck: ["SUPER BI","SALA DO FUTURO","ALUNO PRESENTE"],
@@ -501,11 +594,17 @@
             apresentacaoNotas: ["Resultados de Provas Escritas","Avaliação de Trabalhos","Desempenho em Seminários","Média de Exercícios","Produções Textuais","Autoavaliação","Análise de Portfólios","Registros de Observação","Estudos de Caso","Participação em Debates","Relatórios","Expressão Artística"],
             aspectosPriorizados: ["ASPECTOS ORGANIZACIONAIS","ASPECTOS ACADÊMICOS","ASPECTOS SOCIOEMOCIONAIS","TODOS OS ASPECTOS ACIMA"]
         };
-        for(let g of grupos) {
-            let div = document.getElementById(g);
-            if(div) div.innerHTML = opcoes[g].map(v => `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+        for(let [id, values] of Object.entries(opcoes)) {
+            let container = document.getElementById(id);
+            if(container) container.innerHTML = values.map(v => `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
         }
     }
+
+    // Eventos
+    document.getElementById("gerarRelatorioGeral").addEventListener("click", gerarRelatorioGeralPDF);
+    document.getElementById("closeModalBtn").onclick = () => document.getElementById("modalEscola").style.display = "none";
+    
+    // Iniciar
     initChecklists();
     renderCards();
 </script>
