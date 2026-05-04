@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>URE Caieiras · Acompanhamento Conselho de Classe 1º Bimestre 2026</title>
+    <title>URE Caieiras · Acompanhamento Conselho de Classe · 1º Bimestre 2026</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -25,9 +25,8 @@
             background: #0f1a24e0;
             border-radius: 48px;
             padding: 24px;
-            box-shadow: 0 30px 35px rgba(0,0,0,0.5), inset 0 1px 4px rgba(255,255,200,0.1);
+            box-shadow: 0 30px 35px rgba(0,0,0,0.5);
             border: 1px solid #d32f2f;
-            backdrop-filter: blur(2px);
         }
         .header {
             display: flex;
@@ -43,7 +42,7 @@
         .logo-area { display: flex; align-items: center; gap: 12px; }
         .logo-area img { max-height: 50px; background: white; border-radius: 12px; padding: 4px; }
         .title-badge { background: #d32f2f; color: white; padding: 6px 18px; border-radius: 3rem; font-weight: bold; }
-        h1 { font-size: 1.7rem; font-weight: 800; color: #ffec9e; text-align: center; margin-bottom: 20px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        h1 { font-size: 1.7rem; font-weight: 800; color: #ffec9e; text-align: center; margin-bottom: 20px; }
         .report-bar { display: flex; justify-content: flex-end; gap: 15px; margin-bottom: 25px; }
         button {
             background: linear-gradient(135deg, #0a2f6c, #052050);
@@ -69,10 +68,10 @@
             background: #1e2a36;
             border-radius: 32px;
             padding: 16px;
-            transition: 0.1s;
             cursor: pointer;
             border-left: 6px solid #2ecc71;
             box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            transition: 0.1s;
         }
         .card.vermelho { border-left-color: #e74c3c; background: #2a1f24; }
         .card.verde { border-left-color: #2ecc71; }
@@ -84,12 +83,12 @@
         .indicador-item { display: flex; justify-content: space-between; border-bottom: 1px dashed #567; }
         .card-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
         .modal {
-            display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 1000;
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 1000;
             overflow-y: auto; padding: 20px;
         }
         .modal-content {
             background: #0f1a24;
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 20px auto;
             border-radius: 40px;
             padding: 24px;
@@ -105,21 +104,10 @@
         h3 { color: #f4c542; margin: 20px 0 10px 0; border-left: 4px solid #d32f2f; padding-left: 12px; }
         .close-modal { float: right; background: #d32f2f; border-radius: 40px; padding: 6px 14px; cursor: pointer; }
         .save-btn { margin-top: 20px; width: 100%; padding: 12px; }
-        footer { text-align: center; margin-top: 30px; font-size: 0.7rem; color: #b4c8e0; }
-        .pdf-report-container {
-            position: fixed;
-            top: -9999px;
-            left: -9999px;
-            background: white;
-            color: black;
-            font-family: 'Inter', sans-serif;
-            width: 1100px;
-            padding: 30px;
-            z-index: -1;
-        }
-        .pdf-report-container table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        .pdf-report-container th, .pdf-report-container td { border: 1px solid #aaa; padding: 6px; text-align: left; font-size: 12px; vertical-align: top; }
-        .pdf-report-container th { background: #0a2f6c; color: white; }
+        .historico-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 12px; }
+        .historico-table th, .historico-table td { border: 1px solid #555; padding: 8px; text-align: left; }
+        .pdf-report-container { position: fixed; top: -9999px; left: -9999px; background: white; color: black; width: 1100px; padding: 30px; z-index: -1; }
+        footer { text-align: center; margin-top: 30px; font-size: 0.7rem; }
         @media (max-width: 700px) { .cards-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -128,29 +116,40 @@
     <div class="header">
         <div class="logo-area">
             <img src="https://i.ibb.co/0p01LzxB/logo3de.jpg" alt="Logo SEDUC" onerror="this.src='https://via.placeholder.com/50?text=SEDUC'">
-            <span>Plataforma de Conselho de Classe/Ano · URE Caieiras</span>
+            <span>URE Caieiras · Acompanhamento Conselho</span>
         </div>
-        <div class="title-badge">🎓 Conselho de Classe 1º Bim/2026</div>
+        <div class="title-badge">🎓 1º Bimestre 2026</div>
     </div>
-    <h1><i class="fas fa-chalkboard-user"></i> Acompanhamento Escolas · Semana 10 (05/04 à 11/04) <i class="fas fa-chart-line"></i></h1>
+    <h1><i class="fas fa-calendar-week"></i> Acompanhamento Semana 10 (05/04 a 11/04) <i class="fas fa-school"></i></h1>
     <div class="report-bar">
-        <button id="gerarRelatorioGeral" class="pdf-btn"><i class="fas fa-file-pdf"></i> Relatório PDF (todas escolas)</button>
+        <button id="gerarRelatorioGeral" class="pdf-btn"><i class="fas fa-file-pdf"></i> Relatório Geral (todas escolas)</button>
     </div>
     <div id="cardsContainer" class="cards-grid">Carregando escolas...</div>
-    <footer>✅ Clique no card para editar todos os dados. Cards VERDES = dados iniciais (não salvos) | VERMELHOS = já possuem registro.</footer>
+    <footer>✅ Clique no card para cadastrar um novo acompanhamento (data/turno). Cada dia gera um registro independente. Campo "Responsável" obrigatório.</footer>
 </div>
 
-<!-- MODAL DETALHADO (mesmo do original, completo) -->
+<!-- MODAL PRINCIPAL -->
 <div id="modalEscola" class="modal">
     <div class="modal-content">
         <span class="close-modal" id="closeModalBtn"><i class="fas fa-times"></i> Fechar</span>
-        <h2 id="modalTitulo">Editar Informações</h2>
+        <h2 id="modalTitulo">Registrar Acompanhamento</h2>
+        <div style="background:#2c3e3f; padding:10px; border-radius:20px; margin-bottom:15px;">
+            <span id="escolaNomeDisplay"></span>
+            <span style="float:right">Total de registros: <strong id="totalRegistros">0</strong></span>
+        </div>
+        <div id="historicoArea"></div>
+        <hr style="margin:15px 0;">
+        <h3>📝 Novo Registro</h3>
         <form id="detalhesForm">
             <div class="form-row">
-                <div class="form-group"><label>🏫 Nome Escola</label><input type="text" id="escolaNome" readonly style="background:#3a4a4b;"></div>
-                <div class="form-group"><label>Categoria (PEC/SEC/SUPERVISOR)</label><select id="categoria"><option value="">Selecione</option><option>PEC</option><option>SEC</option><option>SUPERVISOR</option></select></div>
+                <div class="form-group"><label>🧑‍💼 Responsável pelo acompanhamento *</label><input type="text" id="responsavel" placeholder="Nome completo" required></div>
             </div>
-            <h3>📊 Indicadores Semana 10 (05 a 11/04)</h3>
+            <div class="form-row">
+                <div class="form-group"><label>📅 Data do conselho</label><input type="date" id="dataConselho" required></div>
+                <div class="form-group"><label>🕒 Turno</label><select id="turno"><option>manhã</option><option>tarde</option><option>noite</option><option>manhã/tarde</option><option>manhã/noite</option><option>manhã/tarde/noite</option></select></div>
+                <div class="form-group"><label>Categoria (PEC/SEC/SUPERVISOR)</label><select id="categoria"><option>PEC</option><option>SEC</option><option>SUPERVISOR</option></select></div>
+            </div>
+            <h3>📊 Indicadores da Semana (fixos para a escola)</h3>
             <div class="form-row">
                 <div class="form-group"><label>Aluno Presente (%)</label><input type="text" id="alunoPresente"></div>
                 <div class="form-group"><label>Professor Presente (%)</label><input type="text" id="professorPresente"></div>
@@ -158,46 +157,43 @@
                 <div class="form-group"><label>Formação (nota)</label><input type="text" id="formacao"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Apoio Presencial (índice)</label><input type="text" id="apoioPresencial"></div>
-                <div class="form-group"><label>SARESP (média)</label><input type="text" id="saresp"></div>
+                <div class="form-group"><label>Apoio Presencial</label><input type="text" id="apoioPresencial"></div>
+                <div class="form-group"><label>SARESP</label><input type="text" id="saresp"></div>
                 <div class="form-group"><label>SARESP Equidade</label><input type="text" id="sarespEquidade"></div>
                 <div class="form-group"><label>Ajuste Desigualdades</label><input type="text" id="ajusteDesigualdades"></div>
                 <div class="form-group"><label>Nota Geral</label><input type="text" id="notaGeral"></div>
             </div>
             <h3>📌 Dados do Conselho</h3>
             <div class="form-row">
-                <div class="form-group"><label>Turma Observada (série)</label><select id="turmaObservada"><option>5°anoAI</option><option>6°anoAF</option><option>7°anoAF</option><option>8°anoAF</option><option>9°anoAF</option><option>1ª série EM</option><option>2ª série EM</option><option>3ª série EM</option></select></div>
+                <div class="form-group"><label>Turma Observada</label><select id="turmaObservada"><option>5°anoAI</option><option>6°anoAF</option><option>7°anoAF</option><option>8°anoAF</option><option>9°anoAF</option><option>1ª série EM</option><option>2ª série EM</option><option>3ª série EM</option></select></div>
                 <div class="form-group"><label>Conselhos Acompanhados</label><select id="conselhosAcompanhados"><option>Anos iniciais</option><option>Anos finais</option><option>Ensino médio</option></select></div>
             </div>
-            <div><label>🗓️ 3 Períodos com Data e Turno</label></div>
-            <div id="periodosContainer" style="display:flex; flex-wrap:wrap; gap:15px; margin-bottom:15px;"></div>
             <div class="form-row"><div class="form-group"><label>FOI PARTICIPATIVO?</label><select id="participativo"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
-            <div class="form-group"><label>MATRICULADOS NA TURMA</label><input type="number" id="matriculados"></div>
+            <div class="form-group"><label>MATRICULADOS</label><input type="number" id="matriculados"></div>
             <div class="form-group"><label>ESTUDANTES PRESENTES (%)</label><input type="text" id="estudantesPresentes"></div>
             <div class="form-group"><label>Nº PAIS PRESENTES</label><input type="number" id="paisPresentes"></div></div>
-            <div><label>EQUIPE GESTORA PRESENTE</label><div class="checkbox-group" id="gestoraCheck"></div></div>
-            <div><label>⚙️ ELEMENTOS OTIMIZADORES (Conselho)</label><div class="checkbox-group" id="otimizadoresCheck"></div></div>
-            <div><label>🎯 AÇÕES TRATADAS NO CONSELHO</label><div class="checkbox-group" id="acoesCheck"></div></div>
+            <div><label>EQUIPE GESTORA</label><div class="checkbox-group" id="gestoraCheck"></div></div>
+            <div><label>⚙️ ELEMENTOS OTIMIZADORES</label><div class="checkbox-group" id="otimizadoresCheck"></div></div>
+            <div><label>🎯 AÇÕES TRATADAS</label><div class="checkbox-group" id="acoesCheck"></div></div>
             <div><label>📱 PLATAFORMAS OTIMIZADORAS</label><div class="checkbox-group" id="plataformasCheck"></div></div>
-            <div class="form-row"><div class="form-group"><label>APRESENTOU DADOS COMPARATIVOS PROVA PAULISTA?</label><select id="dadosPaulista"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
-            <div class="form-group"><label>APRESENTOU OUTROS INSTRUMENTOS AVALIATIVOS?</label><select id="outrosInstrumentos"><option>Sim</option><option>Não</option><option>Parcial</option></select></div></div>
-            <div><label>📋 QUAIS INSTRUMENTOS FORAM APRESENTADOS</label><div class="checkbox-group" id="instrumentosLista"></div></div>
-            <div class="form-row"><div class="form-group"><label>GRAU INTERAÇÃO ESTUDANTES</label><select id="interacaoEstudantes"><option>MUITA</option><option>POUCA</option><option>NENHUMA</option></select></div>
-            <div class="form-group"><label>GRAU INTERAÇÃO PAIS</label><select id="interacaoPais"><option>MUITA</option><option>POUCA</option><option>NENHUMA</option></select></div></div>
-            <div><label>📝 COMO AS NOTAS FORAM APRESENTADAS?</label><div class="checkbox-group" id="apresentacaoNotas"></div></div>
-            <div><label>🌟 ASPECTOS PRIORIZADOS NO CONSELHO</label><div class="checkbox-group" id="aspectosPriorizados"></div></div>
+            <div class="form-row"><div class="form-group"><label>APRESENTOU DADOS PROVA PAULISTA?</label><select id="dadosPaulista"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
+            <div class="form-group"><label>APRESENTOU OUTROS INSTRUMENTOS?</label><select id="outrosInstrumentos"><option>Sim</option><option>Não</option><option>Parcial</option></select></div></div>
+            <div><label>📋 INSTRUMENTOS APRESENTADOS</label><div class="checkbox-group" id="instrumentosLista"></div></div>
+            <div class="form-row"><div class="form-group"><label>INTERAÇÃO ESTUDANTES</label><select id="interacaoEstudantes"><option>MUITA</option><option>POUCA</option><option>NENHUMA</option></select></div>
+            <div class="form-group"><label>INTERAÇÃO PAIS</label><select id="interacaoPais"><option>MUITA</option><option>POUCA</option><option>NENHUMA</option></select></div></div>
+            <div><label>📝 APRESENTAÇÃO DAS NOTAS</label><div class="checkbox-group" id="apresentacaoNotas"></div></div>
+            <div><label>🌟 ASPECTOS PRIORIZADOS</label><div class="checkbox-group" id="aspectosPriorizados"></div></div>
             <div class="form-row"><div class="form-group"><label>ENGAJAMENTO DOS ESTUDANTES?</label><select id="engajamento"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
             <div class="form-group"><label>DECISÕES COMPARTILHADAS COM PAIS?</label><select id="decisoesPais"><option>Sim</option><option>Não</option><option>Parcial</option></select></div>
             <div class="form-group"><label>PLANO DE AÇÃO DEFINIDO?</label><select id="planoAcao"><option>Sim</option><option>Não</option><option>Parcial</option></select></div></div>
-            <div class="form-group"><label>📝 OBSERVAÇÕES GERAIS</label><textarea id="observacoes" rows="3"></textarea></div>
-            <button type="button" id="salvarDetalhesBtn" class="primary save-btn"><i class="fas fa-save"></i> SALVAR DADOS</button>
+            <div class="form-group"><label>📝 OBSERVAÇÕES</label><textarea id="observacoes" rows="2"></textarea></div>
+            <button type="button" id="salvarDetalhesBtn" class="primary save-btn"><i class="fas fa-save"></i> SALVAR REGISTRO</button>
         </form>
     </div>
 </div>
 
 <script>
-    // FIREBASE CONFIG (substitua pelas suas credenciais)
-    // Your web app's Firebase configuration
+    // ========== FIREBASE CONFIG ========== 
   const firebaseConfig = {
   apiKey: "AIzaSyDHgd5UbrdeXCsfDezkzMEskl0tc4QcBQU",
   authDomain: "ure-caieiras-conselho.firebaseapp.com",
@@ -206,13 +202,15 @@
   messagingSenderId: "713109651546",
   appId: "1:713109651546:web:44b5e50404f3ea50715863"
   };
-    let db, firebaseInicializado = false;
+
+    let db, firebaseReady = false;
     try {
-        if (firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
-        firebaseInicializado = true;
+        firebaseReady = true;
     } catch(e) { console.warn("Firebase fallback para localStorage"); }
 
+    // ========== DADOS DAS ESCOLAS (67) ==========
     // Lista de escolas (mesma do enunciado)
     const escolasDataRaw = [
         { nome:"ADAIL JARBAS DUCLOS - 48823", aluno:"88.3%",prof:"91.6%",plat:"8.5",form:"8.1",apoio:"1.50",saresp:"4.4",equidade:"-3.7",ajuste:"0.50",nota:"7.2"},
@@ -284,221 +282,231 @@
         { nome:"ZILTON BICUDO PROF - 925482", aluno:"78.2%",prof:"75.9%",plat:"7.3",form:"6.8",apoio:"1.75",saresp:"3.7",equidade:"1.6",ajuste:"0.89",nota:"5.6"}
     ];
 
-    function carregarChecklists() {
-        const gestoraDiv = document.getElementById("gestoraCheck"); gestoraDiv.innerHTML = ["DIRETOR(A)","VICE","COORDENAÇÃO","OUTROS PROFISSIONAIS"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-        document.getElementById("otimizadoresCheck").innerHTML = ["SUPER BI","SALA DO FUTURO","ALUNO PRESENTE"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-        document.getElementById("acoesCheck").innerHTML = ["SARESP","AÇÕES DE RECOMPOSIÇÃO","NÃO HOUVE"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-        document.getElementById("plataformasCheck").innerHTML = ["ALURA","KHAN ACADEMY","MATIFIC","LEIA SP","SPEAK","ELEFANTE LETRADO","REDAÇÃO SP"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-        document.getElementById("instrumentosLista").innerHTML = ["Provas Escritas","Trabalhos em Grupo","Seminários","Listas de Exercícios","Questionários","Redações","Autoavaliação","Coavaliação","Portfólios","Observação do Professor","Estudos de Caso","Debates","Relatórios","Lições de Casa","Produções Artísticas"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-        document.getElementById("apresentacaoNotas").innerHTML = ["Resultados de Provas Escritas","Avaliação de Trabalhos","Desempenho em Seminários","Média de Exercícios","Produções Textuais","Autoavaliação","Análise de Portfólios","Registros de Observação","Estudos de Caso","Participação em Debates","Relatórios","Expressão Artística"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-        document.getElementById("aspectosPriorizados").innerHTML = ["ASPECTOS ORGANIZACIONAIS","ASPECTOS ACADÊMICOS","ASPECTOS SOCIOEMOCIONAIS","TODOS OS ASPECTOS ACIMA"].map(v=>`<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
-        let periodosHtml = ''; for(let i=1;i<=3;i++) periodosHtml+=`<div><label>Data ${i}</label><input type="date" class="dataPeriodo" data-idx="${i}"><label>Período</label><select class="periodoSelect" data-idx="${i}"><option>manhã</option><option>tarde</option><option>noite</option><option>manhã/tarde</option><option>manhã/noite</option><option>manhã/tarde/noite</option></select></div>`;
-        document.getElementById("periodosContainer").innerHTML = periodosHtml;
+    // ========== AUX ==========
+    function getEscolaById(nome) { return escolasData.find(e => e.nome === nome); }
+
+    async function salvarAcompanhamento(escolaId, escolaNome, dados) {
+        const registro = {
+            ...dados,
+            escolaNome,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            createdAt: new Date().toISOString()
+        };
+        if (firebaseReady) {
+            const ref = db.collection("escolas").doc(escolaId).collection("acompanhamentos").doc();
+            await ref.set(registro);
+            return ref.id;
+        } else {
+            let local = JSON.parse(localStorage.getItem(`acomp_${escolaId}`) || "[]");
+            local.push({ id: Date.now().toString(), ...registro });
+            localStorage.setItem(`acomp_${escolaId}`, JSON.stringify(local));
+            return Date.now().toString();
+        }
     }
 
-    async function carregarDadosFirestore(escolaId) { 
-        if(firebaseInicializado){ let doc=await db.collection("escolas").doc(escolaId).get(); return doc.exists?doc.data():null; } 
-        else return JSON.parse(localStorage.getItem(`escola_${escolaId}`)); 
-    }
-    async function salvarDadosFirestore(escolaId, dados) { 
-        if(firebaseInicializado) await db.collection("escolas").doc(escolaId).set(dados, {merge:true}); 
-        else localStorage.setItem(`escola_${escolaId}`,JSON.stringify(dados)); 
+    async function getAcompanhamentos(escolaId) {
+        if (firebaseReady) {
+            const snap = await db.collection("escolas").doc(escolaId).collection("acompanhamentos").orderBy("timestamp", "desc").get();
+            return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        } else {
+            return JSON.parse(localStorage.getItem(`acomp_${escolaId}`) || "[]");
+        }
     }
 
-    window.renderCards = async function(){
-        let container=document.getElementById("cardsContainer");
-        container.innerHTML="Carregando...";
-        let cardsHtml="";
-        for(let escola of escolasDataRawFull){
-            let docId=escola.nome.replace(/[ /]/g,"_");
-            let saved=await carregarDadosFirestore(docId);
-            let classeCard=saved?"vermelho":"verde";
-            cardsHtml+=`<div class="card ${classeCard}" data-escola-id="${docId}" data-escola-nome="${escola.nome}">
-                <div class="card-header"><span class="school-name">${escola.nome}</span><span class="status-badge">${saved?"✓ Registrado":"📝 Pendente"}</span></div>
-                <div class="indicadores"><div class="indicador-item"><span>👥 Aluno Pres:</span><b>${saved?.resumo?.aluno || escola.aluno}</b></div>
-                <div class="indicador-item"><span>👩‍🏫 Prof Pres:</span><b>${saved?.resumo?.prof || escola.prof}</b></div>
-                <div class="indicador-item"><span>📱 Plataformas:</span><b>${saved?.resumo?.plat || escola.plat}</b></div>
-                <div class="indicador-item"><span>🎓 Formação:</span><b>${saved?.resumo?.form || escola.form}</b></div>
-                <div class="indicador-item"><span>🤝 Apoio Pres:</span><b>${saved?.resumo?.apoio || escola.apoio}</b></div>
-                <div class="indicador-item"><span>📊 SARESP:</span><b>${saved?.resumo?.saresp || escola.saresp}</b></div>
-                <div class="indicador-item"><span>⚖️ Equidade:</span><b>${saved?.resumo?.equidade || escola.equidade}</b></div>
-                <div class="indicador-item"><span>🔄 Ajuste:</span><b>${saved?.resumo?.ajuste || escola.ajuste}</b></div>
-                <div class="indicador-item"><span>⭐ Nota:</span><b>${saved?.resumo?.nota || escola.nota}</b></div></div>
-                <div class="card-actions"><button class="pdf-card-btn" data-id="${docId}" data-nome="${escola.nome}"><i class="fas fa-print"></i> PDF Escola</button></div>
+    // Render cards
+    async function renderCards() {
+        let container = document.getElementById("cardsContainer");
+        container.innerHTML = "Carregando...";
+        let html = "";
+        for(let escola of escolasData) {
+            let docId = escola.nome.replace(/[ /]/g, "_");
+            let acompList = await getAcompanhamentos(docId);
+            let ultimo = acompList[0] || null;
+            let classe = acompList.length > 0 ? "vermelho" : "verde";
+            let status = acompList.length > 0 ? `✓ ${acompList.length} registro(s)` : "📝 Nenhum";
+            let dadosExibir = ultimo || escola;
+            html += `<div class="card ${classe}" data-escola-id="${docId}" data-escola-nome="${escola.nome}">
+                <div class="card-header"><span class="school-name">${escola.nome}</span><span class="status-badge">${status}</span></div>
+                <div class="indicadores">
+                    <div class="indicador-item"><span>👥 Aluno Pres:</span><b>${dadosExibir.aluno || ''}</b></div>
+                    <div class="indicador-item"><span>👩‍🏫 Prof Pres:</span><b>${dadosExibir.prof || ''}</b></div>
+                    <div class="indicador-item"><span>📱 Plataformas:</span><b>${dadosExibir.plat || ''}</b></div>
+                    <div class="indicador-item"><span>🎓 Formação:</span><b>${dadosExibir.form || ''}</b></div>
+                    <div class="indicador-item"><span>🤝 Apoio Pres:</span><b>${dadosExibir.apoio || ''}</b></div>
+                    <div class="indicador-item"><span>📊 SARESP:</span><b>${dadosExibir.saresp || ''}</b></div>
+                    <div class="indicador-item"><span>⚖️ Equidade:</span><b>${dadosExibir.equidade || ''}</b></div>
+                    <div class="indicador-item"><span>🔄 Ajuste:</span><b>${dadosExibir.ajuste || ''}</b></div>
+                    <div class="indicador-item"><span>⭐ Nota:</span><b>${dadosExibir.nota || ''}</b></div>
+                </div>
+                <div class="card-actions"><button class="pdf-card-btn" data-id="${docId}" data-nome="${escola.nome}"><i class="fas fa-print"></i> PDF último</button></div>
             </div>`;
         }
-        container.innerHTML=cardsHtml;
-        document.querySelectorAll(".card").forEach(card=>card.addEventListener("click",(e)=>{if(!e.target.closest(".pdf-card-btn")) abrirModalEdicao(card.dataset.escolaId,card.dataset.escolaNome);}));
-        document.querySelectorAll(".pdf-card-btn").forEach(btn=>btn.addEventListener("click",(e)=>{e.stopPropagation(); gerarPDFEscolaIndividual(btn.dataset.id,btn.dataset.nome);}));
-    };
-
-    async function abrirModalEdicao(escolaId,nomeEscola){
-        let saved=await carregarDadosFirestore(escolaId);
-        let padrao=escolasDataRawFull.find(e=>e.nome===nomeEscola);
-        let dados={...padrao,...(saved?.resumo||{}),...(saved?.detalhes||{})};
-        document.getElementById("escolaNome").value=nomeEscola;
-        document.getElementById("alunoPresente").value=dados.aluno||padrao.aluno;
-        document.getElementById("professorPresente").value=dados.prof||padrao.prof;
-        document.getElementById("plataformas").value=dados.plat||padrao.plat;
-        document.getElementById("formacao").value=dados.form||padrao.form;
-        document.getElementById("apoioPresencial").value=dados.apoio||padrao.apoio;
-        document.getElementById("saresp").value=dados.saresp||padrao.saresp;
-        document.getElementById("sarespEquidade").value=dados.equidade||padrao.equidade;
-        document.getElementById("ajusteDesigualdades").value=dados.ajuste||padrao.ajuste;
-        document.getElementById("notaGeral").value=dados.nota||padrao.nota;
-        document.getElementById("categoria").value=dados.categoria||"";
-        document.getElementById("turmaObservada").value=dados.turmaObservada||"5°anoAI";
-        document.getElementById("conselhosAcompanhados").value=dados.conselhosAcompanhados||"Anos iniciais";
-        document.getElementById("participativo").value=dados.participativo||"Sim";
-        document.getElementById("matriculados").value=dados.matriculados||"";
-        document.getElementById("estudantesPresentes").value=dados.estudantesPresentes||"";
-        document.getElementById("paisPresentes").value=dados.paisPresentes||"";
-        document.getElementById("dadosPaulista").value=dados.dadosPaulista||"Sim";
-        document.getElementById("outrosInstrumentos").value=dados.outrosInstrumentos||"Não";
-        document.getElementById("interacaoEstudantes").value=dados.interacaoEstudantes||"MUITA";
-        document.getElementById("interacaoPais").value=dados.interacaoPais||"MUITA";
-        document.getElementById("engajamento").value=dados.engajamento||"Sim";
-        document.getElementById("decisoesPais").value=dados.decisoesPais||"Sim";
-        document.getElementById("planoAcao").value=dados.planoAcao||"Sim";
-        document.getElementById("observacoes").value=dados.observacoes||"";
-        // Preencher checklists e períodos (omito para brevidade, mas no código real deve ser implementado similar ao salvamento)
-        window.escolaIdAtual=escolaId;
-        document.getElementById("modalEscola").style.display="block";
+        container.innerHTML = html;
+        document.querySelectorAll(".card").forEach(card => {
+            card.addEventListener("click", (e) => { if(!e.target.closest(".pdf-card-btn")) abrirModal(card.dataset.escolaId, card.dataset.escolaNome); });
+        });
+        document.querySelectorAll(".pdf-card-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => { e.stopPropagation(); gerarPDFUltimo(btn.dataset.id, btn.dataset.nome); });
+        });
     }
 
-    document.getElementById("salvarDetalhesBtn").onclick=async function(){
-        let resumo={aluno:document.getElementById("alunoPresente").value, prof:document.getElementById("professorPresente").value, plat:document.getElementById("plataformas").value, form:document.getElementById("formacao").value, apoio:document.getElementById("apoioPresencial").value, saresp:document.getElementById("saresp").value, equidade:document.getElementById("sarespEquidade").value, ajuste:document.getElementById("ajusteDesigualdades").value, nota:document.getElementById("notaGeral").value};
-        let detalhesColeta={categoria:document.getElementById("categoria").value, turmaObservada:document.getElementById("turmaObservada").value, conselhosAcompanhados:document.getElementById("conselhosAcompanhados").value, participativo:document.getElementById("participativo").value, matriculados:document.getElementById("matriculados").value, estudantesPresentes:document.getElementById("estudantesPresentes").value, paisPresentes:document.getElementById("paisPresentes").value, dadosPaulista:document.getElementById("dadosPaulista").value, outrosInstrumentos:document.getElementById("outrosInstrumentos").value, interacaoEstudantes:document.getElementById("interacaoEstudantes").value, interacaoPais:document.getElementById("interacaoPais").value, engajamento:document.getElementById("engajamento").value, decisoesPais:document.getElementById("decisoesPais").value, planoAcao:document.getElementById("planoAcao").value, observacoes:document.getElementById("observacoes").value, equipeGestora:[...document.querySelectorAll("#gestoraCheck input:checked")].map(i=>i.value), otimizadores:[...document.querySelectorAll("#otimizadoresCheck input:checked")].map(i=>i.value), acoesTratadas:[...document.querySelectorAll("#acoesCheck input:checked")].map(i=>i.value), plataformasUsadas:[...document.querySelectorAll("#plataformasCheck input:checked")].map(i=>i.value), instrumentosAvaliativos:[...document.querySelectorAll("#instrumentosLista input:checked")].map(i=>i.value), apresentacaoNotas:[...document.querySelectorAll("#apresentacaoNotas input:checked")].map(i=>i.value), aspectosPriorizados:[...document.querySelectorAll("#aspectosPriorizados input:checked")].map(i=>i.value)};
-        let periodos=[]; for(let i=1;i<=3;i++){ let data=document.querySelector(`.dataPeriodo[data-idx="${i}"]`).value; let periodo=document.querySelector(`.periodoSelect[data-idx="${i}"]`).value; if(data) periodos.push({data,periodo});}
-        detalhesColeta.periodosDatas=periodos;
-        let documentoFinal={resumo, detalhes:detalhesColeta, ultimaAtualizacao:new Date()};
-        await salvarDadosFirestore(window.escolaIdAtual, documentoFinal);
-        alert("Dados salvos!");
-        document.getElementById("modalEscola").style.display="none";
+    async function abrirModal(escolaId, escolaNome) {
+        window.escolaIdAtual = escolaId;
+        document.getElementById("escolaNomeDisplay").innerText = escolaNome;
+        let acompList = await getAcompanhamentos(escolaId);
+        document.getElementById("totalRegistros").innerText = acompList.length;
+        let historicoHtml = `<h3>📜 Histórico de acompanhamentos</h3><table class="historico-table"><thead><tr><th>Data</th><th>Turno</th><th>Responsável</th><th>Ações</th></tr></thead><tbody>`;
+        for(let reg of acompList) {
+            let dataStr = reg.dataConselho || (reg.timestamp?.toDate ? reg.timestamp.toDate().toLocaleDateString() : '-');
+            historicoHtml += `<tr><td>${dataStr}</td><td>${reg.turno || '-'}</td><td>${reg.responsavel || '-'}</td><td><button class="verRegistroBtn" data-id="${reg.id}" data-json='${JSON.stringify(reg)}'>Ver / PDF</button></td></tr>`;
+        }
+        historicoHtml += `</tbody></table>`;
+        document.getElementById("historicoArea").innerHTML = historicoHtml;
+        // Preencher campos com valores padrão da escola (indicadores)
+        let escola = getEscolaById(escolaNome);
+        if(escola) {
+            document.getElementById("alunoPresente").value = escola.aluno || "";
+            document.getElementById("professorPresente").value = escola.prof || "";
+            document.getElementById("plataformas").value = escola.plat || "";
+            document.getElementById("formacao").value = escola.form || "";
+            document.getElementById("apoioPresencial").value = escola.apoio || "";
+            document.getElementById("saresp").value = escola.saresp || "";
+            document.getElementById("sarespEquidade").value = escola.equidade || "";
+            document.getElementById("ajusteDesigualdades").value = escola.ajuste || "";
+            document.getElementById("notaGeral").value = escola.nota || "";
+        }
+        document.getElementById("responsavel").value = "";
+        document.getElementById("dataConselho").value = "";
+        document.getElementById("turno").value = "manhã";
+        // Limpar checklists (serão preenchidos depois)
+        document.getElementById("modalEscola").style.display = "block";
+        // Eventos dos botões de ver registro
+        document.querySelectorAll(".verRegistroBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                let reg = JSON.parse(btn.dataset.json);
+                gerarPDFRegistro(reg, escolaNome);
+            });
+        });
+    }
+
+    // Salvar novo registro
+    document.getElementById("salvarDetalhesBtn").onclick = async () => {
+        let responsavel = document.getElementById("responsavel").value.trim();
+        let dataConselho = document.getElementById("dataConselho").value;
+        let turno = document.getElementById("turno").value;
+        if(!responsavel || !dataConselho) { alert("Preencha responsável e data do conselho"); return; }
+        let escola = getEscolaById(document.getElementById("escolaNomeDisplay").innerText);
+        let dados = {
+            responsavel, dataConselho, turno,
+            categoria: document.getElementById("categoria").value,
+            alunoPresente: document.getElementById("alunoPresente").value,
+            professorPresente: document.getElementById("professorPresente").value,
+            plataformas: document.getElementById("plataformas").value,
+            formacao: document.getElementById("formacao").value,
+            apoioPresencial: document.getElementById("apoioPresencial").value,
+            saresp: document.getElementById("saresp").value,
+            sarespEquidade: document.getElementById("sarespEquidade").value,
+            ajusteDesigualdades: document.getElementById("ajusteDesigualdades").value,
+            notaGeral: document.getElementById("notaGeral").value,
+            turmaObservada: document.getElementById("turmaObservada").value,
+            conselhosAcompanhados: document.getElementById("conselhosAcompanhados").value,
+            participativo: document.getElementById("participativo").value,
+            matriculados: document.getElementById("matriculados").value,
+            estudantesPresentes: document.getElementById("estudantesPresentes").value,
+            paisPresentes: document.getElementById("paisPresentes").value,
+            equipeGestora: [...document.querySelectorAll("#gestoraCheck input:checked")].map(i=>i.value),
+            otimizadores: [...document.querySelectorAll("#otimizadoresCheck input:checked")].map(i=>i.value),
+            acoesTratadas: [...document.querySelectorAll("#acoesCheck input:checked")].map(i=>i.value),
+            plataformasUsadas: [...document.querySelectorAll("#plataformasCheck input:checked")].map(i=>i.value),
+            instrumentosAvaliativos: [...document.querySelectorAll("#instrumentosLista input:checked")].map(i=>i.value),
+            apresentacaoNotas: [...document.querySelectorAll("#apresentacaoNotas input:checked")].map(i=>i.value),
+            aspectosPriorizados: [...document.querySelectorAll("#aspectosPriorizados input:checked")].map(i=>i.value),
+            dadosPaulista: document.getElementById("dadosPaulista").value,
+            outrosInstrumentos: document.getElementById("outrosInstrumentos").value,
+            interacaoEstudantes: document.getElementById("interacaoEstudantes").value,
+            interacaoPais: document.getElementById("interacaoPais").value,
+            engajamento: document.getElementById("engajamento").value,
+            decisoesPais: document.getElementById("decisoesPais").value,
+            planoAcao: document.getElementById("planoAcao").value,
+            observacoes: document.getElementById("observacoes").value
+        };
+        await salvarAcompanhamento(window.escolaIdAtual, document.getElementById("escolaNomeDisplay").innerText, dados);
+        alert("Registro salvo com sucesso!");
+        document.getElementById("modalEscola").style.display = "none";
         renderCards();
     };
 
-    // ==================== PDF COMPLETO COM TODOS OS CAMPOS ====================
-    async function gerarPDFEscolaIndividual(escolaId, nomeEscola) {
-        try {
-            let saved = await carregarDadosFirestore(escolaId);
-            let padrao = escolasDataRawFull.find(e=>e.nome===nomeEscola);
-            const resumo = saved?.resumo || padrao;
-            const detalhes = saved?.detalhes || {};
-            
-            const div = document.createElement('div');
-            div.className = 'pdf-report-container';
-            div.style.position = 'absolute';
-            div.style.backgroundColor = 'white';
-            div.style.padding = '25px';
-            div.style.width = '1000px';
-            div.style.fontFamily = 'Inter, sans-serif';
-            div.innerHTML = `
-                <div style="text-align:center; margin-bottom:25px;">
-                    <h2 style="color:#0a2f6c;">UNIDADE REGIONAL DE ENSINO CAIEIRAS</h2>
-                    <h3>Conselho de Classe - 1º Bimestre 2026</h3>
-                    <h4>Relatório Detalhado da Escola</h4>
-                    <p><strong>${nomeEscola}</strong> - Semana 10 (05/04 a 11/04)</p>
-                </div>
-                
-                <h3>📊 Indicadores da Semana</h3>
-                <table> <tr><th>Indicador</th><th>Valor</th></tr>
-                    <tr><td>Aluno Presente (%)</td><td>${resumo.aluno || ''}</td></tr>
-                    <tr><td>Professor Presente (%)</td><td>${resumo.prof || ''}</td></tr>
-                    <tr><td>Plataformas (nota)</td><td>${resumo.plat || ''}</td></tr>
-                    <tr><td>Formação (nota)</td><td>${resumo.form || ''}</td></tr>
-                    <tr><td>Apoio Presencial</td><td>${resumo.apoio || ''}</td></tr>
-                    <tr><td>SARESP</td><td>${resumo.saresp || ''}</td></tr>
-                    <tr><td>SARESP Equidade</td><td>${resumo.equidade || ''}</td></tr>
-                    <tr><td>Ajuste de Desigualdades</td><td>${resumo.ajuste || ''}</td></tr>
-                    <tr><td>Nota Geral</td><td>${resumo.nota || ''}</td></tr>
-                </table>
-
-                <h3>📌 Dados do Conselho</h3>
-                <table> <tr><th>Campo</th><th>Resposta</th></tr>
-                    <tr><td>Categoria</td><td>${detalhes.categoria || '-'}</td></tr>
-                    <tr><td>Turma Observada</td><td>${detalhes.turmaObservada || '-'}</td></tr>
-                    <tr><td>Conselhos Acompanhados</td><td>${detalhes.conselhosAcompanhados || '-'}</td></tr>
-                    <tr><td>Foi Participativo?</td><td>${detalhes.participativo || '-'}</td></tr>
-                    <tr><td>Matriculados na Turma</td><td>${detalhes.matriculados || '-'}</td></tr>
-                    <tr><td>Estudantes Presentes (%)</td><td>${detalhes.estudantesPresentes || '-'}</td></tr>
-                    <tr><td>Número de Pais Presentes</td><td>${detalhes.paisPresentes || '-'}</td></tr>
-                    <tr><td>Equipe Gestora Presente</td><td>${(detalhes.equipeGestora || []).join(', ') || '-'}</td></tr>
-                    <tr><td>Elementos Otimizadores</td><td>${(detalhes.otimizadores || []).join(', ') || '-'}</td></tr>
-                    <tr><td>Ações Tratadas</td><td>${(detalhes.acoesTratadas || []).join(', ') || '-'}</td></tr>
-                    <tr><td>Plataformas Utilizadas</td><td>${(detalhes.plataformasUsadas || []).join(', ') || '-'}</td></tr>
-                    <tr><td>Dados comparativos Prova Paulista?</td><td>${detalhes.dadosPaulista || '-'}</td></tr>
-                    <tr><td>Apresentou outros instrumentos?</td><td>${detalhes.outrosInstrumentos || '-'}</td></tr>
-                    <tr><td>Instrumentos Avaliativos Apresentados</td><td>${(detalhes.instrumentosAvaliativos || []).join(', ') || '-'}</td></tr>
-                    <tr><td>Grau Interação Estudantes</td><td>${detalhes.interacaoEstudantes || '-'}</td></tr>
-                    <tr><td>Grau Interação Pais</td><td>${detalhes.interacaoPais || '-'}</td></tr>
-                    <tr><td>Como as notas foram apresentadas?</td><td>${(detalhes.apresentacaoNotas || []).join(', ') || '-'}</td></tr>
-                    <tr><td>Aspectos Priorizados</td><td>${(detalhes.aspectosPriorizados || []).join(', ') || '-'}</td></tr>
-                    <tr><td>Engajamento dos estudantes</td><td>${detalhes.engajamento || '-'}</td></tr>
-                    <tr><td>Decisões compartilhadas com pais?</td><td>${detalhes.decisoesPais || '-'}</td></tr>
-                    <tr><td>Plano de ação definido?</td><td>${detalhes.planoAcao || '-'}</td></tr>
-                </table>
-                <h3>📅 Períodos Registrados</h3>
-                <table><tr><th>Data</th><th>Turno</th></tr>
-                    ${(detalhes.periodosDatas || []).map(p => `<tr><td>${p.data}</td><td>${p.periodo}</td></tr>`).join('') || '<tr><td colspan="2">Nenhum período registrado</td></tr>'}
-                </table>
-                <h3>✏️ Observações Gerais</h3>
-                <p style="border:1px solid #ccc; padding:10px;">${detalhes.observacoes || 'Nenhuma observação'}</p>
-                <p style="font-size:10px; margin-top:30px;">Relatório gerado em ${new Date().toLocaleString()}</p>
-            `;
-            document.body.appendChild(div);
-            const canvas = await html2canvas(div, { scale: 2 });
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const imgWidth = 190;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            let heightLeft = imgHeight;
-            let position = 10;
-            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-            heightLeft -= (pdf.internal.pageSize.height - 20);
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-                heightLeft -= (pdf.internal.pageSize.height - 20);
-            }
-            pdf.save(`Relatorio_${nomeEscola.substring(0,40)}.pdf`);
-            document.body.removeChild(div);
-        } catch(e) { alert("Erro ao gerar PDF: "+e.message); }
+    // Funções de PDF (geral e individual)
+    async function gerarPDFRegistro(reg, nomeEscola) {
+        const div = document.createElement('div');
+        div.className = 'pdf-report-container';
+        div.innerHTML = `<div style="text-align:center"><h2>URE CAIEIRAS</h2><h3>Conselho de Classe - Acompanhamento</h3><p><strong>${nomeEscola}</strong></p><p>Data: ${reg.dataConselho} | Turno: ${reg.turno}</p><p>Responsável: ${reg.responsavel}</p></div>
+        <h3>Indicadores da Semana</h3><table>${Object.entries(reg).filter(([k])=>['alunoPresente','professorPresente','plataformas','formacao','apoioPresencial','saresp','sarespEquidade','ajusteDesigualdades','notaGeral'].includes(k)).map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</table>
+        <h3>Dados do Conselho</h3><table>${Object.entries(reg).filter(([k])=>['turmaObservada','conselhosAcompanhados','participativo','matriculados','estudantesPresentes','paisPresentes','dadosPaulista','outrosInstrumentos','interacaoEstudantes','interacaoPais','engajamento','decisoesPais','planoAcao','observacoes'].includes(k)).map(([k,v])=>`<tr><th>${k}</th><td>${v}</td></tr>`).join('')}</table>
+        <h3>Checklists</h3><p><strong>Equipe Gestora:</strong> ${(reg.equipeGestora||[]).join(', ')}</p>
+        <p><strong>Otimizadores:</strong> ${(reg.otimizadores||[]).join(', ')}</p>
+        <p><strong>Ações:</strong> ${(reg.acoesTratadas||[]).join(', ')}</p>
+        <p><strong>Plataformas:</strong> ${(reg.plataformasUsadas||[]).join(', ')}</p>
+        <p><strong>Instrumentos:</strong> ${(reg.instrumentosAvaliativos||[]).join(', ')}</p>
+        <p><strong>Apresentação Notas:</strong> ${(reg.apresentacaoNotas||[]).join(', ')}</p>
+        <p><strong>Aspectos Priorizados:</strong> ${(reg.aspectosPriorizados||[]).join(', ')}</p>`;
+        document.body.appendChild(div);
+        const canvas = await html2canvas(div, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 190;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+        pdf.save(`Acompanhamento_${nomeEscola.substring(0,30)}_${reg.dataConselho}.pdf`);
+        document.body.removeChild(div);
     }
-
+    async function gerarPDFUltimo(escolaId, nomeEscola) {
+        let acomp = await getAcompanhamentos(escolaId);
+        if(acomp.length) gerarPDFRegistro(acomp[0], nomeEscola);
+        else alert("Nenhum registro encontrado");
+    }
     async function gerarRelatorioGeralPDF() {
-        const divGeral = document.createElement('div');
-        divGeral.className = 'pdf-report-container';
-        divGeral.style.position = 'absolute';
-        divGeral.style.backgroundColor = 'white';
-        divGeral.style.padding = '20px';
-        divGeral.style.width = '1100px';
-        divGeral.innerHTML = `<div style="text-align:center;"><h2>URE CAIEIRAS - Relatório Geral do Conselho de Classe</h2><h3>1º Bimestre 2026 - Semana 10</h3><p>Total: ${escolasDataRawFull.length} escolas</p></div>
-        <table style="width:100%; border-collapse:collapse; font-size:9px;"><thead><tr><th>Escola</th><th>Aluno%</th><th>Prof%</th><th>Plataf.</th><th>Formação</th><th>Apoio</th><th>SARESP</th><th>Equidade</th><th>Ajuste</th><th>Nota</th></tr></thead><tbody>`;
-        for(let escola of escolasDataRawFull){
-            let docId=escola.nome.replace(/[ /]/g,"_");
-            let saved=await carregarDadosFirestore(docId);
-            let data=saved?.resumo || escola;
-            divGeral.innerHTML += `<tr><td>${escola.nome}</td><td>${data.aluno||''}</td><td>${data.prof||''}</td><td>${data.plat||''}</td><td>${data.form||''}</td><td>${data.apoio||''}</td><td>${data.saresp||''}</td><td>${data.equidade||''}</td><td>${data.ajuste||''}</td><td>${data.nota||''}</td></tr>`;
+        let todas = [];
+        for(let escola of escolasData) {
+            let acomp = await getAcompanhamentos(escola.nome.replace(/[ /]/g,"_"));
+            if(acomp.length) todas.push({escola: escola.nome, ultimo: acomp[0]});
         }
-        divGeral.innerHTML += `</tbody></table><p>Gerado em ${new Date().toLocaleString()}</p>`;
-        document.body.appendChild(divGeral);
-        const canvas = await html2canvas(divGeral, { scale: 2 });
+        const div = document.createElement('div');
+        div.className = 'pdf-report-container';
+        div.innerHTML = `<h2>Relatório Geral - URE Caieiras</h2><p>Total de escolas com registros: ${todas.length}</p><table border="1"><tr><th>Escola</th><th>Última data</th><th>Responsável</th><th>Aluno%</th><th>Nota</th></tr>${todas.map(t=>`<tr><td>${t.escola}</td><td>${t.ultimo.dataConselho}</td><td>${t.ultimo.responsavel}</td><td>${t.ultimo.alunoPresente}</td><td>${t.ultimo.notaGeral}</td></tr>`).join('')}</table>`;
+        document.body.appendChild(div);
+        const canvas = await html2canvas(div, { scale: 2 });
         const imgData = canvas.toDataURL('image/png');
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('landscape', 'mm', 'a4');
         const imgWidth = 280;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-        pdf.save(`Relatorio_Geral_Conselho_2026.pdf`);
-        document.body.removeChild(divGeral);
+        pdf.save(`Relatorio_Geral_Conselho.pdf`);
+        document.body.removeChild(div);
     }
 
     document.getElementById("gerarRelatorioGeral").addEventListener("click", gerarRelatorioGeralPDF);
-    document.getElementById("closeModalBtn").onclick=()=>document.getElementById("modalEscola").style.display="none";
-    carregarChecklists();
+    document.getElementById("closeModalBtn").onclick = () => document.getElementById("modalEscola").style.display = "none";
+    // Inicializar checklists
+    function initChecklists() {
+        const grupos = ["gestoraCheck","otimizadoresCheck","acoesCheck","plataformasCheck","instrumentosLista","apresentacaoNotas","aspectosPriorizados"];
+        const opcoes = {
+            gestoraCheck: ["DIRETOR(A)","VICE","COORDENAÇÃO","OUTROS PROFISSIONAIS"],
+            otimizadoresCheck: ["SUPER BI","SALA DO FUTURO","ALUNO PRESENTE"],
+            acoesCheck: ["SARESP","AÇÕES DE RECOMPOSIÇÃO","NÃO HOUVE"],
+            plataformasCheck: ["ALURA","KHAN ACADEMY","MATIFIC","LEIA SP","SPEAK","ELEFANTE LETRADO","REDAÇÃO SP"],
+            instrumentosLista: ["Provas Escritas","Trabalhos em Grupo","Seminários","Listas de Exercícios","Questionários","Redações","Autoavaliação","Coavaliação","Portfólios","Observação do Professor","Estudos de Caso","Debates","Relatórios","Lições de Casa","Produções Artísticas"],
+            apresentacaoNotas: ["Resultados de Provas Escritas","Avaliação de Trabalhos","Desempenho em Seminários","Média de Exercícios","Produções Textuais","Autoavaliação","Análise de Portfólios","Registros de Observação","Estudos de Caso","Participação em Debates","Relatórios","Expressão Artística"],
+            aspectosPriorizados: ["ASPECTOS ORGANIZACIONAIS","ASPECTOS ACADÊMICOS","ASPECTOS SOCIOEMOCIONAIS","TODOS OS ASPECTOS ACIMA"]
+        };
+        for(let g of grupos) {
+            let div = document.getElementById(g);
+            if(div) div.innerHTML = opcoes[g].map(v => `<label><input type="checkbox" value="${v}"> ${v}</label>`).join('');
+        }
+    }
+    initChecklists();
     renderCards();
 </script>
 </body>
